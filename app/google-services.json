@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "205659268035",
+    "firebase_url": "https://memeking-11156.firebaseio.com",
+    "project_id": "memeking-11156",
+    "storage_bucket": "memeking-11156.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:205659268035:android:e2cac5acba496c547b1376",
+        "android_client_info": {
+          "package_name": "dhaliwal.production.memeking"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "205659268035-nchvis3qf83s4u6prjkfqgl7jbicmlp7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "dhaliwal.production.memeking",
+            "certificate_hash": "1705fc847c2735abc26b51547647dc8ebdc55bb3"
+          }
+        },
+        {
+          "client_id": "205659268035-8f57ik3gu8isfuplbeodbmmvpd1djq2o.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAH1aVRR2CnA2I6FzYM-u3N0SCHxc6WQYQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "205659268035-8f57ik3gu8isfuplbeodbmmvpd1djq2o.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

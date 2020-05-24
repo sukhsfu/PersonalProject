@@ -1,0 +1,97 @@
+package dhaliwal.production.memeking.Utils;
+
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ProgressBar;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
+
+import com.bumptech.glide.Glide;
+
+import java.util.ArrayList;
+
+import dhaliwal.production.memeking.R;
+import dhaliwal.production.memeking.ui.gallery.GalleryFragment;
+
+/**
+ * Created by User on 6/4/2017.
+ */
+
+public class GridImageAdapter extends ArrayAdapter<String>{
+
+    private Context mContext;
+    private LayoutInflater mInflater;
+    private int layoutResource;
+    private ArrayList<String> imgURLs;
+
+    public GridImageAdapter(Context context, int layoutResource,ArrayList<String> imgURLs) {
+        super(context, layoutResource, imgURLs);
+        mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        mContext = context;
+        this.layoutResource = layoutResource;
+        this.imgURLs = imgURLs;
+    }
+
+    private static class ViewHolder{
+        SquareImageView image;
+
+    }
+
+    @NonNull
+    @Override
+    public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+
+        /*
+        Viewholder build pattern (Similar to recyclerview)
+         */
+        final ViewHolder holder;
+        if(convertView == null){
+            convertView = mInflater.inflate(layoutResource, parent, false);
+            holder = new ViewHolder();
+            holder.image = (SquareImageView) convertView.findViewById(R.id.gridImageView);
+
+            convertView.setTag(holder);
+        }
+        else{
+            holder = (ViewHolder) convertView.getTag();
+        }
+
+        String imageuri = getItem(position);
+
+
+        Glide.with(mContext)
+                .load(imageuri)
+                .placeholder(R.mipmap.placeholder)
+                .into(holder.image);
+
+
+
+        return convertView;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
