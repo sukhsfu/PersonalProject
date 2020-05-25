@@ -4,12 +4,14 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
@@ -17,6 +19,11 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserInfo;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -38,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
         /* Handler to start the next activity.
         * Two cases-if the user is already signed in navigate to display activity.
         * otherwise take to the login activity. */
+
         Handler myhandler = new Handler();
         myhandler.postDelayed(new Runnable() {
             @Override
@@ -55,6 +63,9 @@ public class MainActivity extends AppCompatActivity {
             }
         }, 600);
     }
+
+
+
     //Overriding the Onstart in case the user is already signed to the app;
     @Override
     protected void onStart() {
