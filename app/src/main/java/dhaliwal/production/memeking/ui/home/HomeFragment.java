@@ -46,6 +46,11 @@ public class HomeFragment extends Fragment implements jadapter.OnNoteListener, A
     private RecyclerView list;
     private Context context;
 
+    public HomeFragment(){
+
+    }
+
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         //viewmodel should be used later to load the data.
