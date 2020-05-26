@@ -75,6 +75,8 @@ public class LoginActivity extends AppCompatActivity {
                 final DatabaseReference databaseReference=database.getReference("user_profile");
 
                 //set the user_name and profilephoto only if he signed up first time.
+                //make sure it is single value event.
+                //datareference to whole "user_profile"
                 databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {

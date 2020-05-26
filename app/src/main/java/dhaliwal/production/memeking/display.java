@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -22,6 +23,11 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserInfo;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
 
@@ -77,48 +83,59 @@ public class display extends AppCompatActivity {
                 }
             }
         });*/
-        //setting username and profile from the sign-in provider.
-        try {
+        //setting username and profile from the realtime data provider..
+
             retrieveuserinformation();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
     }
-    //get user-name and profile photo from the sign-providers and set it on side bar
-    private void retrieveuserinformation() throws IOException {
+    //get user-name and profile photo from the realtime database  and set it on side bar
+    private void retrieveuserinformation()  {
         FirebaseUser user= FirebaseAuth.getInstance().getCurrentUser();
         //getting the imageview and textview id's
         NavigationView navigationView=findViewById(R.id.nav_view);
         View mview=navigationView.getHeaderView(0);
-        ImageView profileimage=mview.findViewById(R.id.profileImage);
-        TextView username=mview.findViewById(R.id.textview_MeMeKing);
-        if(user!=null){
-            String name = null;
-            Uri photoUri = null;
-           for(UserInfo profile:user.getProviderData()){
-               if(name==null)
-                name=profile.getDisplayName();
-               //if(photoUri==null) {
-                   if (profile.getPhotoUrl() != null)
-                       photoUri = profile.getPhotoUrl();
+        final ImageView profileimage=mview.findViewById(R.id.profileImage);
+        final TextView username=mview.findViewById(R.id.textview_MeMeKing);
+        final FirebaseDatabase database=FirebaseDatabase.getInstance();
+        //get the datareference of profile_photo and username
+        final DatabaseReference profile_photoReference=database.getReference("user_profile").child(user.getUid()).child("profile_photo");
+        DatabaseReference usernameReference=database.getReference("user_profile").child(user.getUid()).child("username");
+        //addValueListener to profile_photoreference
+        profile_photoReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                String photoUri=dataSnapshot.getValue(String.class);
+                Glide.with(display.this)
+                        .load(photoUri)
+                        .placeholder(R.mipmap.placeholder)
+                        .centerCrop()
+                        .into(profileimage);
+            }
 
-               //}
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
 
-           }
-          // Intent intent=getIntent();
-          // intent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION|Intent.FLAG_GRANT_READ_URI_PERMISSION|Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-          // getContentResolver().takePersistableUriPermission(photoUri,Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            }
+        });
+        usernameReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                String name=dataSnapshot.getValue(String.class);
+                username.setText(name);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
 
 
-            Glide.with(this)
-                       .load(photoUri)
-                       .placeholder(R.mipmap.placeholder)
-                       .centerCrop()
-                       .into(profileimage);
-               username.setText(name);
 
-        }
+
+
+
     }
 
 
