@@ -30,8 +30,14 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserInfo;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import dhaliwal.production.memeking.R;
+import dhaliwal.production.memeking.UserProfileInfo;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -50,32 +56,40 @@ public class settingsFragment extends Fragment {
         settingsViewModel = new ViewModelProvider(this).get(settingsViewModel.class);
         View root = inflater.inflate(R.layout.fragment_settings, container, false);
 
-         profileImageChanger=root.findViewById(R.id.profileImageChanger);
-        EditText username=root.findViewById(R.id.settings_username);
+        profileImageChanger=root.findViewById(R.id.profileImageChanger);
+        final EditText username=root.findViewById(R.id.settings_username);
         Button savechanges=root.findViewById(R.id.settings_savechanges);
-        //user is already present.
-        final FirebaseUser user= FirebaseAuth.getInstance().getCurrentUser();
-        String name = null;
-        Uri photoUri = null;
-        if (user != null) {
-            for(UserInfo profile:user.getProviderData()){
-                if(name==null)
-                    name=profile.getDisplayName();
-                if(photoUri==null)
-                    if(profile.getPhotoUrl()!=null)
-                        photoUri=profile.getPhotoUrl();
+        //gettiing the user from the firebase authentication
+        FirebaseUser user= FirebaseAuth.getInstance().getCurrentUser();
+        //get the user from the firebase realtime database and set it in imageview and edittext
+        final FirebaseDatabase database=FirebaseDatabase.getInstance();
+        final DatabaseReference user_Profile=database.getReference("user_profile").child(user.getUid());
+        user_Profile.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                UserProfileInfo userProfileInfo=dataSnapshot.getValue(UserProfileInfo.class);
+                String photoUri=userProfileInfo.getProfile_photo();
+                String name=userProfileInfo.getUsername();
+
+                Glide.with(getContext())
+                        .load(photoUri)
+                        .placeholder(R.mipmap.placeholder)
+                        .centerCrop()
+                        .into(profileImageChanger);
+
+                username.setText(name);
 
             }
 
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
 
-            Glide.with(getContext())
-                    .load(photoUri)
-                    .placeholder(R.mipmap.placeholder)
-                    .centerCrop()
-                    .into(profileImageChanger);
+            }
+        });
 
-            username.setText(name);
-        }
+
+
+
 
         profileImageChanger.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -93,21 +107,6 @@ public class settingsFragment extends Fragment {
                 //2.send username to firebase.//send if name !=changed name.
                 //3.take to memes activity.
 
-                if(selectedImage!=null){
-                    UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
-                            .setPhotoUri(selectedImage)
-                            .build();
-                    user.updateProfile(profileUpdates)
-                            .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    if (task.isSuccessful()) {
-                                        Log.d(TAG, "User profile updated.");
-                                    }
-                                }
-                            });
-
-                }
 
 
 
