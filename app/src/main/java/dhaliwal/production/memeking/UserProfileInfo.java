@@ -1,6 +1,6 @@
 package dhaliwal.production.memeking;
 
-class UserProfileInfo {
+public class UserProfileInfo {
     private int audience;
     private int following;
     private int points;
