@@ -1,22 +1,18 @@
 package dhaliwal.production.memeking.ui.settings;
 
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.util.Log;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -24,14 +20,22 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.bumptech.glide.Glide;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.UserInfo;
-import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import dhaliwal.production.memeking.R;
+import dhaliwal.production.memeking.UserProfileInfo;
+import dhaliwal.production.memeking.ui.gallery.GalleryFragment;
+import dhaliwal.production.memeking.ui.home.HomeFragment;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -42,41 +46,71 @@ public class settingsFragment extends Fragment {
     private static final int RESULT_LOAD_IMAGE=1;
     private ImageView profileImageChanger;
     private Uri selectedImage=null;
+    private String changedname=null;
     private Context context;
     private  String TAG="settings";
+    private String name;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
+                             final ViewGroup container, Bundle savedInstanceState) {
         settingsViewModel = new ViewModelProvider(this).get(settingsViewModel.class);
         View root = inflater.inflate(R.layout.fragment_settings, container, false);
 
-         profileImageChanger=root.findViewById(R.id.profileImageChanger);
-        EditText username=root.findViewById(R.id.settings_username);
-        Button savechanges=root.findViewById(R.id.settings_savechanges);
-        //user is already present.
+        profileImageChanger=root.findViewById(R.id.profileImageChanger);
+        final EditText username=root.findViewById(R.id.settings_username);
+        final Button savechanges=root.findViewById(R.id.settings_savechanges);
+        //gettiing the user from the firebase authentication
         final FirebaseUser user= FirebaseAuth.getInstance().getCurrentUser();
-        String name = null;
-        Uri photoUri = null;
-        if (user != null) {
-            for(UserInfo profile:user.getProviderData()){
-                if(name==null)
-                    name=profile.getDisplayName();
-                if(photoUri==null)
-                    if(profile.getPhotoUrl()!=null)
-                        photoUri=profile.getPhotoUrl();
+        //get the user from the firebase realtime database and set it in imageview and edittext
+        final FirebaseDatabase database=FirebaseDatabase.getInstance();
+        final DatabaseReference user_Profile=database.getReference("user_profile").child(user.getUid());
+        user_Profile.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                UserProfileInfo userProfileInfo=dataSnapshot.getValue(UserProfileInfo.class);
+                String photoUri=userProfileInfo.getProfile_photo();
+                 name=userProfileInfo.getUsername();
+
+                Glide.with(getContext())
+                        .load(photoUri)
+                        .placeholder(R.mipmap.placeholder)
+                        .centerCrop()
+                        .into(profileImageChanger);
+
+                username.setText(name);
 
             }
 
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
 
-            Glide.with(getContext())
-                    .load(photoUri)
-                    .placeholder(R.mipmap.placeholder)
-                    .centerCrop()
-                    .into(profileImageChanger);
+            }
+        });
+        //set text watcher on edittext
+        username.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                changedname=String.valueOf(s);
+            }
 
-            username.setText(name);
-        }
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                changedname=String.valueOf(s);
 
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
+
+
+
+
+
+            //click on the image to change profile_picture.
         profileImageChanger.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -85,29 +119,79 @@ public class settingsFragment extends Fragment {
                 startActivityForResult(intent,RESULT_LOAD_IMAGE);
             }
         });
+        //set click listener on the textview.
+        //...
+
         //OnclickListener for the Done Button.
         savechanges.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                savechanges.setEnabled(false);
                  //1.send profile photo to firebase.//send if selectedImage!=null
                 //2.send username to firebase.//send if name !=changed name.
                 //3.take to memes activity.
 
+                //if the user set image
                 if(selectedImage!=null){
-                    UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
-                            .setPhotoUri(selectedImage)
-                            .build();
-                    user.updateProfile(profileUpdates)
-                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                     FirebaseStorage storage= FirebaseStorage.getInstance();
+                     String path="UserProfilePhoto/"+user.getUid()+"pic";
+                   final StorageReference storageReference=storage.getReference(path);
+                   UploadTask uploadTask= storageReference.putFile(selectedImage);
+                    uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            user_Profile.addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    if (task.isSuccessful()) {
-                                        Log.d(TAG, "User profile updated.");
-                                    }
+                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                    final UserProfileInfo userProfileInfo=dataSnapshot.getValue(UserProfileInfo.class);
+                                    storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                        @Override
+                                        public void onSuccess(Uri uri) {
+                                            userProfileInfo.setProfile_photo(uri.toString());
+                                            user_Profile.setValue(userProfileInfo);
+                                            //add fragmentTransaction here.
+                                            savechanges.setEnabled(true);
+                                        }
+                                    });
+                                }
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError databaseError) {
+
                                 }
                             });
+                        }
+                    });
+                }
+                //if the username is changed.
+                if(!(changedname.equals(name))){
+                    user_Profile.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                             UserProfileInfo userProfileInfo=dataSnapshot.getValue(UserProfileInfo.class);
+                             userProfileInfo.setUsername(changedname);
+                            user_Profile.setValue(userProfileInfo);
+                            if(selectedImage==null) {
+                                //transaction to homefragment.
+                                savechanges.setEnabled(true);
+                               /* getActivity().getSupportFragmentManager()
+                                        .beginTransaction()
+                                        .replace(R.id.setting_layout,new HomeFragment())
+                                        .commit();*/
+                            }
+
+                        }
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+
 
                 }
+
+
+
+
 
 
 

@@ -11,7 +11,6 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.GridView;
 import android.widget.Toast;
 
@@ -20,23 +19,19 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelProviders;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.firebase.FirebaseApp;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
-import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.UUID;
 
 import dhaliwal.production.memeking.R;
 import dhaliwal.production.memeking.Utils.GridImageAdapter;
-import dhaliwal.production.memeking.ui.home.HomeViewModel;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -46,6 +41,8 @@ public class GalleryFragment extends Fragment  {
     private GalleryViewModel galleryViewModel;
     private GridView gridView;
     private ArrayList<Uri> imageuritoupload;
+
+
 
 
     @Override
