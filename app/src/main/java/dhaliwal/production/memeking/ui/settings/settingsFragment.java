@@ -34,6 +34,7 @@ import com.google.firebase.storage.UploadTask;
 
 import dhaliwal.production.memeking.R;
 import dhaliwal.production.memeking.UserProfileInfo;
+import dhaliwal.production.memeking.ui.gallery.GalleryFragment;
 import dhaliwal.production.memeking.ui.home.HomeFragment;
 
 import static android.app.Activity.RESULT_OK;
@@ -148,6 +149,7 @@ public class settingsFragment extends Fragment {
                                         public void onSuccess(Uri uri) {
                                             userProfileInfo.setProfile_photo(uri.toString());
                                             user_Profile.setValue(userProfileInfo);
+                                            //add fragmentTransaction here.
                                             savechanges.setEnabled(true);
                                         }
                                     });
@@ -170,10 +172,11 @@ public class settingsFragment extends Fragment {
                             user_Profile.setValue(userProfileInfo);
                             if(selectedImage==null) {
                                 //transaction to homefragment.
-                                getActivity().getSupportFragmentManager()
+                                savechanges.setEnabled(true);
+                               /* getActivity().getSupportFragmentManager()
                                         .beginTransaction()
                                         .replace(R.id.setting_layout,new HomeFragment())
-                                        .commit();
+                                        .commit();*/
                             }
 
                         }
