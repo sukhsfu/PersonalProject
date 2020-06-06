@@ -18,6 +18,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -55,6 +56,7 @@ public class settingsFragment extends Fragment {
                              final ViewGroup container, Bundle savedInstanceState) {
         settingsViewModel = new ViewModelProvider(this).get(settingsViewModel.class);
         View root = inflater.inflate(R.layout.fragment_settings, container, false);
+        final View touch=root;
 
         profileImageChanger=root.findViewById(R.id.profileImageChanger);
         final EditText username=root.findViewById(R.id.settings_username);
@@ -150,7 +152,7 @@ public class settingsFragment extends Fragment {
                                             userProfileInfo.setProfile_photo(uri.toString());
                                             user_Profile.setValue(userProfileInfo);
                                             //add fragmentTransaction here.
-                                            savechanges.setEnabled(true);
+                                            Navigation.findNavController(touch).navigate(R.id.nav_home);
                                         }
                                     });
                                 }
@@ -171,12 +173,8 @@ public class settingsFragment extends Fragment {
                              userProfileInfo.setUsername(changedname);
                             user_Profile.setValue(userProfileInfo);
                             if(selectedImage==null) {
-                                //transaction to homefragment.
-                                savechanges.setEnabled(true);
-                               /* getActivity().getSupportFragmentManager()
-                                        .beginTransaction()
-                                        .replace(R.id.setting_layout,new HomeFragment())
-                                        .commit();*/
+                               Navigation.findNavController(touch).navigate(R.id.nav_home);
+
                             }
 
                         }
@@ -187,6 +185,9 @@ public class settingsFragment extends Fragment {
                     });
 
 
+                }
+                if(selectedImage==null && changedname.equals(name)){
+                    Navigation.findNavController(touch).navigate(R.id.nav_home);
                 }
 
 
