@@ -11,90 +11,125 @@
         android:id="@+id/profilefragmentImage"
         android:layout_width="180dp"
         android:layout_height="180dp"
-        android:layout_marginTop="60dp"
         app:civ_border_color="#FF000000"
         app:civ_border_width="2dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintBottom_toTopOf="@+id/guidelineHor33"
+        app:layout_constraintStart_toEndOf="@+id/guidelineVertical25" />
 
     <TextView
         android:id="@+id/profilefragmentusername"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="106dp"
-        android:layout_marginTop="262dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:text="text"
         android:textColor="#FF000000"
         android:textSize="22sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintStart_toEndOf="@+id/guidelineVertical25"
+        app:layout_constraintTop_toBottomOf="@+id/guidelineHor33" />
 
     <TextView
         android:id="@+id/profilefragmentfollowingnum"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="47dp"
-        android:layout_marginTop="339dp"
+        android:layout_marginStart="13dp"
+        android:text="text"
         android:textColor="#FF000000"
         android:textSize="22sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintStart_toEndOf="@+id/guidelineVertical12"
+        app:layout_constraintTop_toBottomOf="@+id/guidelineHor47" />
 
     <TextView
         android:id="@+id/profilefragmentaudiencenumber"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="335dp"
-        android:layout_marginEnd="95dp"
+        android:layout_marginStart="13dp"
+        android:text="text"
         android:textColor="#FF000000"
         android:textSize="22sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintStart_toEndOf="@+id/guideLineVertical60"
+        app:layout_constraintTop_toBottomOf="@+id/guidelineHor47" />
 
     <TextView
         android:id="@+id/textView7"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="47dp"
-        android:layout_marginTop="388dp"
+        android:layout_marginTop="13dp"
         android:text="Following"
         android:textSize="22sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintStart_toEndOf="@+id/guidelineVertical12"
+        app:layout_constraintTop_toBottomOf="@+id/profilefragmentfollowingnum" />
 
     <TextView
         android:id="@+id/textView8"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="388dp"
-        android:layout_marginEnd="64dp"
+        android:layout_marginTop="13dp"
         android:text="Audience"
         android:textSize="22sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintStart_toEndOf="@+id/guideLineVertical60"
+        app:layout_constraintTop_toBottomOf="@+id/profilefragmentaudiencenumber" />
 
     <TextView
         android:id="@+id/textView9"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="47dp"
-        android:layout_marginTop="506dp"
         android:text="Points:-"
         android:textSize="22sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintStart_toEndOf="@+id/guidelineVertical12"
+        app:layout_constraintTop_toBottomOf="@+id/guidelineHor70" />
 
     <TextView
         android:id="@+id/profilefragmentpoints"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="504dp"
-        android:layout_marginEnd="148dp"
+        android:text="text"
         android:textColor="#FF000000"
         android:textSize="22sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintStart_toEndOf="@+id/guideLineVertical60"
+        app:layout_constraintTop_toBottomOf="@+id/guidelineHor70" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineVertical12"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.12" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideLineVertical60"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.6" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineHor33"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.33" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineHor47"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.47" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineVertical25"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.25" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineHor70"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.7" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
