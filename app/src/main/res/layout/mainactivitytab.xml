@@ -4,30 +4,114 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
 
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="20dp">
 
-            <TextView
-                android:id="@+id/textView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="User Name"
-                android:paddingStart="20dp"
-                app:layout_constraintTop_toTopOf="parent"  />
+          <androidx.constraintlayout.widget.ConstraintLayout
+              android:id="@+id/tabtop"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              app:layout_constraintStart_toStartOf="parent"
+              app:layout_constraintTop_toTopOf="parent">
+              <de.hdodenhof.circleimageview.CircleImageView
+                  android:id="@+id/tabprofilepicture"
+                  android:layout_width="60dp"
+                  android:layout_height="60dp"
+                  android:contentDescription="@string/tabuserpicture"
+                  app:civ_border_color="#FF000000"
+                  app:civ_border_width="2dp"
+                  android:src="@drawable/ic_cancel"
+                  app:layout_constraintStart_toStartOf="parent"
+                  app:layout_constraintTop_toTopOf="parent"/>
+
+              <TextView
+                  android:id="@+id/tabusername"
+                  android:layout_width="wrap_content"
+                  android:layout_height="60dp"
+                  android:text="User name"
+                  android:gravity="center"
+                  android:textColor="#373634"
+                  android:paddingStart="20dp"
+                  android:textSize="20dp"
+                  app:layout_constraintTop_toTopOf="parent"
+                  app:layout_constraintStart_toEndOf="@+id/tabprofilepicture"/>
+              <TextView
+                  android:id="@+id/tabfollow"
+                  android:layout_width="wrap_content"
+                  android:layout_height="60dp"
+                  android:text="@string/follow"
+                  android:gravity="center"
+                  android:clickable="true"
+                  android:textColor="#4d94ff"
+                  android:paddingEnd="15dp"
+                  android:textSize="15dp"
+                  app:layout_constraintEnd_toEndOf="parent"
+                  app:layout_constraintTop_toTopOf="parent"
+                  android:focusable="true" />
+
+
+
+          </androidx.constraintlayout.widget.ConstraintLayout>
+
 
             <dhaliwal.production.memeking.Utils.SquareImageView
                 android:id="@+id/imageView2"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                app:layout_constraintTop_toBottomOf="@+id/textView"
-                android:scaleType="centerCrop" />
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@+id/tabtop"
+                app:layout_constraintStart_toStartOf="parent"
+                android:scaleType="fitXY"/>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                app:layout_constraintTop_toBottomOf="@+id/imageView2"
+                app:layout_constraintStart_toStartOf="parent">
+                <ImageView
+                    android:id="@+id/tabfireimage"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="20dp"
+                    android:src="@drawable/firebw"
+                    android:clickable="true"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:focusable="true" />
+
+                <TextView
+                    android:id="@+id/tablitnumber"
+                    android:layout_width="wrap_content"
+                    android:layout_height="50dp"
+                    android:layout_marginStart="20dp"
+                    android:gravity="center"
+                    android:text="0"
+                    android:textColor="#373634"
+                    android:textSize="20dp"
+                    app:layout_constraintStart_toEndOf="@+id/tabfireimage"
+                    app:layout_constraintTop_toTopOf="parent" />
+                <TextView
+                    android:id="@+id/tabreport"
+                    android:layout_width="wrap_content"
+                    android:layout_height="60dp"
+                    android:text="@string/report"
+                    android:gravity="center"
+                    android:clickable="true"
+                    android:textColor="#4d94ff"
+                    android:paddingEnd="15dp"
+                    android:textSize="15dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:focusable="true" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>

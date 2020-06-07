@@ -23,6 +23,13 @@ import androidx.lifecycle.ViewModelProvider;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -30,6 +37,7 @@ import com.google.firebase.storage.UploadTask;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import dhaliwal.production.memeking.Post;
 import dhaliwal.production.memeking.R;
 import dhaliwal.production.memeking.Utils.GridImageAdapter;
 
@@ -79,16 +87,23 @@ public class GalleryFragment extends Fragment  {
             startActivityForResult(galleryIntent,RESULT_LOAD_IMAGE);
         }
 
-
+        //button clicked to upload image.
         final FloatingActionButton buttonupload=root.findViewById(R.id.fab_gallery);
         buttonupload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(imageuritoupload.size()!=0){
+                    //getting user and storage reference
+                    FirebaseUser user= FirebaseAuth.getInstance().getCurrentUser();
+                    final String uid=user.getUid();
+                    FirebaseDatabase database=FirebaseDatabase.getInstance();
+
                     buttonupload.setEnabled(false);
                     for(Uri image:imageuritoupload){
                         String path="Memes/"+UUID.randomUUID();
+                        String path2=path.substring(6);
                         StorageReference storageReference=storage.getReference(path);
+                        final DatabaseReference memePhotoReferences=database.getReference("memepicture").child(path2);
                         UploadTask uploadTask=storageReference.putFile(image);
                         uploadTask.addOnFailureListener(new OnFailureListener() {
                             @Override
@@ -99,6 +114,8 @@ public class GalleryFragment extends Fragment  {
                         }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                             @Override
                             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                Post post=new Post(uid);
+                                memePhotoReferences.setValue(post);
                                 Toast.makeText(getContext(),"Successful",Toast.LENGTH_SHORT).show();
                             }
                         });
