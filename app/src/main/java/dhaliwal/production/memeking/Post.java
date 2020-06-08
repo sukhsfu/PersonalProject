@@ -13,6 +13,7 @@ public class Post {
         // Default constructor required for calls to DataSnapshot.getValue(Post.class)
     }
 
+
     public Post(String uid) {
         this.uid = uid;
     }

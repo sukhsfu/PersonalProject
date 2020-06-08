@@ -59,7 +59,7 @@ public class Profile extends Fragment {
         //get the firebase realtime database and fill the profile
         final FirebaseDatabase database=FirebaseDatabase.getInstance();
         final DatabaseReference user_Profile=database.getReference("user_profile").child(user.getUid());
-        user_Profile.addListenerForSingleValueEvent(new ValueEventListener() {
+        user_Profile.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 //get the UserProfile object

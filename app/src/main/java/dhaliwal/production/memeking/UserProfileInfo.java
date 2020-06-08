@@ -1,16 +1,21 @@
 package dhaliwal.production.memeking;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class UserProfileInfo {
     private int audience;
     private int following;
     private int points;
     private String profile_photo;
     private String username;
-
+    public Map<String,Boolean> followingId=new HashMap<>();
+    public Map<String,Boolean> AudienceId=new HashMap<>();
     public UserProfileInfo(){
         // Default constructor required for calls to DataSnapshot.getValue(User.class)
 
     }
+
 
 
     public UserProfileInfo(String profile_photo, String username) {

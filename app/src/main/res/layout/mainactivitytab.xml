@@ -12,7 +12,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp">
+            android:layout_marginBottom="10dp">
 
           <androidx.constraintlayout.widget.ConstraintLayout
               android:id="@+id/tabtop"
@@ -23,7 +23,7 @@
               <de.hdodenhof.circleimageview.CircleImageView
                   android:id="@+id/tabprofilepicture"
                   android:layout_width="60dp"
-                  android:layout_height="60dp"
+                  android:layout_height="50dp"
                   android:contentDescription="@string/tabuserpicture"
                   app:civ_border_color="#FF000000"
                   app:civ_border_width="2dp"
@@ -34,26 +34,32 @@
               <TextView
                   android:id="@+id/tabusername"
                   android:layout_width="wrap_content"
-                  android:layout_height="60dp"
+                  android:layout_height="45dp"
                   android:text="User name"
                   android:gravity="center"
                   android:textColor="#373634"
-                  android:paddingStart="20dp"
-                  android:textSize="20dp"
+                  android:paddingStart="5dp"
+                  android:textSize="19sp"
                   app:layout_constraintTop_toTopOf="parent"
                   app:layout_constraintStart_toEndOf="@+id/tabprofilepicture"/>
+              <ImageView
+                  android:id="@+id/tabcoin"
+                  android:layout_width="20dp"
+                  android:layout_height="45dp"
+                  android:src="@drawable/coin"
+                  app:layout_constraintTop_toTopOf="parent"
+                  app:layout_constraintEnd_toEndOf="parent" />
               <TextView
-                  android:id="@+id/tabfollow"
+                  android:id="@+id/tabtotalpoints"
                   android:layout_width="wrap_content"
-                  android:layout_height="60dp"
-                  android:text="@string/follow"
+                  android:layout_height="45dp"
                   android:gravity="center"
                   android:clickable="true"
-                  android:textColor="#4d94ff"
-                  android:paddingEnd="15dp"
-                  android:textSize="15dp"
-                  app:layout_constraintEnd_toEndOf="parent"
+                  android:textColor="#373634"
+                  android:paddingEnd="5dp"
+                  android:textSize="15sp"
                   app:layout_constraintTop_toTopOf="parent"
+                  app:layout_constraintEnd_toStartOf="@+id/tabcoin"
                   android:focusable="true" />
 
 
@@ -71,13 +77,13 @@
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="60dp"
+                android:layout_height="wrap_content"
                 app:layout_constraintTop_toBottomOf="@+id/imageView2"
                 app:layout_constraintStart_toStartOf="parent">
                 <ImageView
                     android:id="@+id/tabfireimage"
                     android:layout_width="40dp"
-                    android:layout_height="40dp"
+                    android:layout_height="30dp"
                     android:layout_marginStart="20dp"
                     android:src="@drawable/firebw"
                     android:clickable="true"
@@ -88,24 +94,24 @@
                 <TextView
                     android:id="@+id/tablitnumber"
                     android:layout_width="wrap_content"
-                    android:layout_height="50dp"
+                    android:layout_height="30dp"
                     android:layout_marginStart="20dp"
                     android:gravity="center"
                     android:text="0"
                     android:textColor="#373634"
-                    android:textSize="20dp"
+                    android:textSize="20sp"
                     app:layout_constraintStart_toEndOf="@+id/tabfireimage"
                     app:layout_constraintTop_toTopOf="parent" />
                 <TextView
-                    android:id="@+id/tabreport"
+                    android:id="@+id/tabfollow"
                     android:layout_width="wrap_content"
-                    android:layout_height="60dp"
-                    android:text="@string/report"
+                    android:layout_height="30dp"
+                    android:text="@string/follow"
                     android:gravity="center"
                     android:clickable="true"
                     android:textColor="#4d94ff"
                     android:paddingEnd="15dp"
-                    android:textSize="15dp"
+                    android:textSize="15sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     android:focusable="true" />
