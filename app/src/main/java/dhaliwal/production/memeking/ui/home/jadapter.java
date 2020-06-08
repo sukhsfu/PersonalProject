@@ -28,6 +28,7 @@ import com.google.firebase.storage.StorageReference;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 import dhaliwal.production.memeking.Post;
 import dhaliwal.production.memeking.R;
@@ -126,15 +127,20 @@ public class jadapter extends RecyclerView.Adapter<jadapter.vholder> {
 
                 }
                 //user of app
-                DatabaseReference userReferenceApp = database.getReference("user_profile").child(user.getUid());
+                DatabaseReference userReferenceApp = database.getReference("user_profile").child(user.getUid()).child("followingId");
 
-                userReferenceApp.addListenerForSingleValueEvent(new ValueEventListener() {
+                userReferenceApp.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        UserProfileInfo userinfodata = dataSnapshot.getValue(UserProfileInfo.class);
-                        if (userinfodata.followingId.containsKey(uid)) {
-                            holder.tabfollow.setText("following");
-                        } else {
+                        Map<String,Boolean> map = (Map)dataSnapshot.getValue();
+                        if(map!=null) {
+                            if (map.containsKey(uid)) {
+                                holder.tabfollow.setText("following");
+                            } else {
+                                holder.tabfollow.setText("+follow");
+                            }
+                        }
+                        else{
                             holder.tabfollow.setText("+follow");
                         }
                     }
