@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
@@ -19,6 +20,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.Navigation;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -63,11 +65,20 @@ public class GalleryFragment extends Fragment  {
         LayoutInflater layoutInflater=inflater.cloneInContext(contextThemeWrapper);
         //view root inflated
         View root = layoutInflater.inflate(R.layout.fragment_gallery, container, false);
+        final View touch=root;
 
         Toolbar toolbar=(Toolbar) root.findViewById(R.id.bottom_app_bar);
         toolbar.inflateMenu(R.menu.bottomppbar_menu);
         gridView=(root).findViewById(R.id.grid);
         Menu menu=toolbar.getMenu();
+        MenuItem item=menu.getItem(0);
+        item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                Navigation.findNavController(touch).navigate(R.id.nav_home);
+                return false;
+            }
+        });
 
         imageuritoupload=new ArrayList<>();
         final FirebaseStorage storage= FirebaseStorage.getInstance();
@@ -127,8 +138,10 @@ public class GalleryFragment extends Fragment  {
 
             }
         });
+
         return root;
     }
+
     @Override
     public void onActivityResult(int requestcode,int resultcode,Intent data) {
         super.onActivityResult(requestcode, resultcode, data);
