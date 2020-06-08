@@ -302,6 +302,9 @@ public class jadapter extends RecyclerView.Adapter<jadapter.vholder> {
                             }
                         });
                     }
+                    else{
+                        updatedata(holder,postReferenceName);
+                    }
 
                 }
                 else{
@@ -327,6 +330,9 @@ public class jadapter extends RecyclerView.Adapter<jadapter.vholder> {
                                 updatedata(holder,postReferenceName);
                             }
                         });
+                    }
+                    else{
+                        updatedata(holder,postReferenceName);
                     }
                 }
                 mutableData.setValue(post);
