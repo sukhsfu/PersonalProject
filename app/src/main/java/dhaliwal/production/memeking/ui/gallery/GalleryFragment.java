@@ -36,7 +36,13 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Locale;
+import java.util.TimeZone;
 import java.util.UUID;
 
 import dhaliwal.production.memeking.Post;
@@ -112,9 +118,24 @@ public class GalleryFragment extends Fragment  {
                     buttonupload.setEnabled(false);
                     for(Uri image:imageuritoupload){
                         String path="Memes/"+UUID.randomUUID();
-                        String path2=path.substring(6);
+                        final String path2=path.substring(6);
+                        String randomString;
+                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                            randomString= Instant.now()+path.substring(6,9);
+                            randomString=randomString.replace(".","");
+                        }
+                        else{
+                            TimeZone timeZone= TimeZone.getTimeZone("UTC");
+                            Calendar calendar=Calendar.getInstance(timeZone);
+                            SimpleDateFormat simpleDateFormat=new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",Locale.US);
+                            simpleDateFormat.setTimeZone(timeZone);
+                            randomString=simpleDateFormat.format(calendar.getTime())+path.substring(6,9);
+                            randomString=randomString.replace(".","");
+                        }
+
                         StorageReference storageReference=storage.getReference(path);
                         final DatabaseReference memePhotoReferences=database.getReference("memepicture").child(path2);
+                       final  DatabaseReference memes=database.getReference("memes").child(randomString);
                         UploadTask uploadTask=storageReference.putFile(image);
                         uploadTask.addOnFailureListener(new OnFailureListener() {
                             @Override
@@ -127,6 +148,7 @@ public class GalleryFragment extends Fragment  {
                             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                                 Post post=new Post(uid);
                                 memePhotoReferences.setValue(post);
+                                memes.setValue(path2);
                                 Toast.makeText(getContext(),"Successful",Toast.LENGTH_SHORT).show();
                             }
                         });

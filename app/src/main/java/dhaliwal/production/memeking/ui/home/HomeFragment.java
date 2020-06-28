@@ -14,6 +14,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.ListResult;
 import com.google.firebase.storage.StorageReference;
@@ -56,7 +58,8 @@ public class HomeFragment extends Fragment implements jadapter.OnNoteListener, A
         list.setNestedScrollingEnabled(false);
         list.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
         list.setLayoutManager(new LinearLayoutManager(getContext()));
-
+        FirebaseDatabase database=FirebaseDatabase.getInstance();
+        DatabaseReference memes=database.getReference("memes");
 
 
         memesReference.listAll()
