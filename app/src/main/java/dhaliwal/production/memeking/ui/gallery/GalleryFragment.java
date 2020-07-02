@@ -16,6 +16,7 @@ import android.widget.GridView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
@@ -31,6 +32,8 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.MutableData;
+import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -114,7 +117,7 @@ public class GalleryFragment extends Fragment  {
                     FirebaseUser user= FirebaseAuth.getInstance().getCurrentUser();
                     final String uid=user.getUid();
                     FirebaseDatabase database=FirebaseDatabase.getInstance();
-
+                    final int[] count = {0,0};
                     buttonupload.setEnabled(false);
                     for(Uri image:imageuritoupload){
                         String path="Memes/"+UUID.randomUUID();
@@ -141,6 +144,7 @@ public class GalleryFragment extends Fragment  {
                             @Override
                             public void onFailure(@NonNull Exception e) {
                                 Toast.makeText(getContext(),"Failed",Toast.LENGTH_SHORT).show();
+                                count[1]++;
 
                             }
                         }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -149,19 +153,47 @@ public class GalleryFragment extends Fragment  {
                                 Post post=new Post(uid);
                                 memePhotoReferences.setValue(post);
                                 memes.setValue(path2);
-                                Toast.makeText(getContext(),"Successful",Toast.LENGTH_SHORT).show();
+
+                                count[0]++;
+                                if((count[0]+count[1])==imageuritoupload.size())
+                                incrementCount(count[0]);
                             }
                         });
 
-
-
                     }
+
                 }
 
             }
         });
 
         return root;
+    }
+
+    private void incrementCount(final int count) {
+        if(count!=0){
+            FirebaseDatabase database=FirebaseDatabase.getInstance();
+            DatabaseReference countReference=database.getReference("counting").child("count");
+            countReference.runTransaction(new Transaction.Handler() {
+                @NonNull
+                @Override
+                public Transaction.Result doTransaction(@NonNull MutableData mutableData) {
+                    Integer getcount=mutableData.getValue(Integer.class);
+                    if(getcount==null){
+                        return Transaction.success(mutableData);
+                    }
+                    getcount=count+getcount;
+                    mutableData.setValue(getcount);
+                    return Transaction.success(mutableData);
+                }
+
+                @Override
+                public void onComplete(@Nullable DatabaseError databaseError, boolean b, @Nullable DataSnapshot dataSnapshot) {
+                    Toast.makeText(getContext(),"Successful",Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+
     }
 
     @Override

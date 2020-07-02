@@ -129,7 +129,7 @@ public class jadapter extends RecyclerView.Adapter<jadapter.vholder> {
                 //user of app
                 DatabaseReference userReferenceApp = database.getReference("user_profile").child(user.getUid()).child("followingId");
 
-                userReferenceApp.addValueEventListener(new ValueEventListener() {
+                userReferenceApp.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         Map<String,Boolean> map = (Map)dataSnapshot.getValue();
