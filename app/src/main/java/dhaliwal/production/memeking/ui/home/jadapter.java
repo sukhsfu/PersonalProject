@@ -385,4 +385,8 @@ public class jadapter extends RecyclerView.Adapter<jadapter.vholder> {
 
         }
     }
+    public void clear(){
+        Downloadimages.clear();
+        notifyDataSetChanged();
+    }
 }
