@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
@@ -28,7 +29,7 @@ import java.util.Collections;
 
 import dhaliwal.production.memeking.R;
 
-public class HomeFragment extends Fragment implements jadapter.OnNoteListener, AdapterView.OnItemSelectedListener {
+public class HomeFragment extends Fragment implements jadapter.OnNoteListener, AdapterView.OnItemSelectedListener{
 
     private HomeViewModel homeViewModel;
     //Arraylist of StorageReference to pass to jadapter.
@@ -36,6 +37,7 @@ public class HomeFragment extends Fragment implements jadapter.OnNoteListener, A
     private jadapter Jadapter;
     private RecyclerView list;
     private Context context;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     public HomeFragment(){
 
@@ -84,22 +86,30 @@ public class HomeFragment extends Fragment implements jadapter.OnNoteListener, A
         });
 
 
-       /* memesReference.listAll()
-                .addOnSuccessListener(new OnSuccessListener<ListResult>() {
-                    @Override
-                    public void onSuccess(ListResult listResult) {
-                        downloadImage=new ArrayList<>();
-                        downloadImage.addAll(listResult.getItems());
-                        //function to attach adapter to Recyclerview
-                        setRecyclerView();
-
-                    }
-                });*/
-        //setting username and profile from the sign-in provider.
 
         return root;
 
     }
+    @Override
+    public void onViewCreated(View view,Bundle savedInstanceState){
+        swipeRefreshLayout=view.findViewById(R.id.swipeContainer);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+
+            }
+        });
+        swipeRefreshLayout.setColorSchemeResources(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
+
+
+
+
+    }
+
+
 
 
 
