@@ -1,5 +1,6 @@
 const functions = require('firebase-functions');
 
+
    // The Firebase Admin SDK to access Cloud Firestore.
    const admin = require('firebase-admin');
    admin.initializeApp();
@@ -29,6 +30,16 @@ const functions = require('firebase-functions');
          memes_ref.child(childSnapshot.key).remove();
         }
         });
+        const bucket=admin.storage().bucket();
+        for(index=0;index<photorefs.length;index++){
+        try{
+        bucket.file('Memes/'+photorefs[index]).delete();
+        }
+        catch(error){
+        console.log(error);
+        }
+        }
+
       });
       const memepicture_ref=change.after.ref.parent.child("memepicture");
       memepicture_ref.once('value',function(snapshot){
@@ -38,6 +49,7 @@ const functions = require('firebase-functions');
          }
        });
       });
+
 
 
    return change.after.ref.update({count:newCount});
