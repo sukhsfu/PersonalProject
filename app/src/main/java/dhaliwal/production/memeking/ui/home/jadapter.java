@@ -389,4 +389,8 @@ public class jadapter extends RecyclerView.Adapter<jadapter.vholder> {
         Downloadimages.clear();
         notifyDataSetChanged();
     }
+    public void addAll(ArrayList<StorageReference> Downloadimages){
+        this.Downloadimages.addAll(Downloadimages);
+        notifyDataSetChanged();
+    }
 }

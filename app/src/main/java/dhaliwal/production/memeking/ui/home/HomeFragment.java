@@ -24,6 +24,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.ListResult;
 import com.google.firebase.storage.StorageReference;
 
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -54,8 +55,6 @@ public class HomeFragment extends Fragment implements jadapter.OnNoteListener, A
 
         //Firebase setup getInstance().
         final FirebaseStorage storage=FirebaseStorage.getInstance();
-        //reference to the Memes folder in the bucket.
-        final StorageReference memesReference=storage.getReference().child("Memes");
         //set up recylcerview;
         list=root.findViewById(R.id.homerecylerview);
         list.setHasFixedSize(true);
@@ -92,10 +91,39 @@ public class HomeFragment extends Fragment implements jadapter.OnNoteListener, A
     }
     @Override
     public void onViewCreated(View view,Bundle savedInstanceState){
+
         swipeRefreshLayout=view.findViewById(R.id.swipeContainer);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                //
+                final FirebaseStorage storage=FirebaseStorage.getInstance();
+                FirebaseDatabase database=FirebaseDatabase.getInstance();
+                DatabaseReference memes=database.getReference("memes");
+                memes.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        ArrayList<StorageReference> downloadImage2=new ArrayList<>();
+                        for(DataSnapshot ds:dataSnapshot.getChildren()){
+                            String memereferid=ds.getValue(String.class);
+                            StorageReference memesReference2=storage.getReference().child("Memes").child(memereferid);
+                            downloadImage2.add(memesReference2);
+                        }
+                        Collections.reverse(downloadImage2);
+
+                        Jadapter.clear();
+                        Jadapter.addAll(downloadImage2);
+                        swipeRefreshLayout.setRefreshing(false);
+
+                    }
+
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+
 
             }
         });
