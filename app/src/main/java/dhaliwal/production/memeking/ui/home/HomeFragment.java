@@ -127,7 +127,7 @@ public class HomeFragment extends Fragment implements jadapter.OnNoteListener, A
 
             }
         });
-        swipeRefreshLayout.setColorSchemeResources(android.R.color.black,
+        swipeRefreshLayout.setColorSchemeResources(android.R.color.darker_gray,
                 android.R.color.holo_green_light,
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
