@@ -2,7 +2,6 @@ package dhaliwal.production.memeking.ui.home;
 
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +13,7 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.ads.NativeExpressAdView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -34,67 +34,97 @@ import dhaliwal.production.memeking.Post;
 import dhaliwal.production.memeking.R;
 import dhaliwal.production.memeking.UserProfileInfo;
 
-public class jadapter extends RecyclerView.Adapter<jadapter.vholder> {
+public class jadapter extends RecyclerView.Adapter {
 
     //arraylist of StorageReferences to display images.
-    private ArrayList<StorageReference> Downloadimages;
+    private ArrayList<Object> Downloadimages;
     //context to use in Glide.
     private Context context;
-    private OnNoteListener monNoteListener;
 
-    public interface OnNoteListener{
-        void onNoteClick(int position);
-    }
+    //
+    private static final int DATA_VIEW_TYPE = 0;
+    private static final int NATIVE_EXPRESS_AD_VIEW_TYPE = 1;
+    private int spaceBetweenAds;
+
+
     /*
     *@param Downloadimages 1000 StorageReferences's to display in recylerView.
      */
-    jadapter(ArrayList<StorageReference> Downloadimages, OnNoteListener monNoteListener, Context context){
-        this.monNoteListener=monNoteListener;
+    jadapter(ArrayList<Object> Downloadimages,Context context,int spaceBetweenAds){
         this.Downloadimages=Downloadimages;
         this.context=context;
+        this.spaceBetweenAds=spaceBetweenAds;
 
     }
 
     @NotNull
     @Override
-    public vholder onCreateViewHolder( ViewGroup parent, int viewType) {
-        LayoutInflater flate= LayoutInflater.from(parent.getContext());
-        //Edit main Activity tab.
-        View view=flate.inflate(R.layout.mainactivitytab,parent,false);
-        return new vholder(view,monNoteListener);
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        switch (viewType) {
+            case DATA_VIEW_TYPE:
+                LayoutInflater flate = LayoutInflater.from(parent.getContext());
+                View view = flate.inflate(R.layout.mainactivitytab, parent, false);
+                return  new vholder(view);
+            case NATIVE_EXPRESS_AD_VIEW_TYPE:
+            default:
+                LayoutInflater flate2 = LayoutInflater.from(parent.getContext());
+                View view2 = flate2.inflate(R.layout.adlayout, parent, false);
+                return new NativeExpressAdViewHolder(view2);
+
+
+        }
+
     }
 
     @Override
-    public void onBindViewHolder(@NotNull final vholder holder, int position) {
-       //use Glide to set images in recyclerview.
-        StorageReference thisimage = Downloadimages.get(position);
-        final String postReferenceName=thisimage.getName();
+    public void onBindViewHolder(@NotNull RecyclerView.ViewHolder holder2, int position) {
+        int viewType=getItemViewType(position);
+        switch (viewType) {
+            case DATA_VIEW_TYPE:
+                //use Glide to set images in recyclerview.
+                StorageReference thisimage = (StorageReference)Downloadimages.get(position);
+                final String postReferenceName = thisimage.getName();
+                final vholder holder = (vholder) holder2;
 
+                updatedata(holder, postReferenceName);
 
-        updatedata(holder,postReferenceName);
+                Glide.with(context)
+                        .load(thisimage)
+                        .placeholder(R.mipmap.placeholder)
+                        .into(holder.memes);
 
-        Glide.with(context)
-                .load(thisimage)
-                .placeholder(R.mipmap.placeholder)
-                .into(holder.memes);
+                //fireimage on click listener
+                holder.fire.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        onStarClicked(holder, postReferenceName);
 
-        //fireimage on click listener
-        holder.fire.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onStarClicked(holder,postReferenceName);
+                    }
 
-            }
+                });
+                //on follow button clicked
+                holder.tabfollow.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        onfollowClicked(holder, postReferenceName);
 
-        });
-        //on follow button clicked
-        holder.tabfollow.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onfollowClicked(holder,postReferenceName);
+                    }
+                });
+                break;
+            case NATIVE_EXPRESS_AD_VIEW_TYPE:
+            default:
+                NativeExpressAdViewHolder nativeExpressHolder = (NativeExpressAdViewHolder) holder2;
+                NativeExpressAdView adView = (NativeExpressAdView) Downloadimages.get(position);
+                ViewGroup adCardView = (ViewGroup) nativeExpressHolder.itemView;
 
-            }
-        });
+                if (adCardView.getChildCount() > 0) {
+                    adCardView.removeAllViews();
+                }
+                if (adView.getParent() != null) {
+                    ((ViewGroup) adView.getParent()).removeView(adView);
+                }
+                adCardView.addView(adView);
+        }
 
 
 
@@ -348,14 +378,23 @@ public class jadapter extends RecyclerView.Adapter<jadapter.vholder> {
 
     }
 
-
+    // View Holder for Admob Native Express Ad Unit
+    public class NativeExpressAdViewHolder extends RecyclerView.ViewHolder {
+        NativeExpressAdViewHolder(View view) {
+            super(view);
+        }
+    }
 
     @Override
     public int getItemCount() {
         return Downloadimages.size();
     }
+    @Override
+    public int getItemViewType(int position) {
+        return (position % (spaceBetweenAds + 1) == spaceBetweenAds) ? NATIVE_EXPRESS_AD_VIEW_TYPE: DATA_VIEW_TYPE;
+    }
 
-    public class vholder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class vholder extends RecyclerView.ViewHolder {
         ImageView memes;
         ImageView profilePicture;
         ImageView fire;
@@ -365,25 +404,21 @@ public class jadapter extends RecyclerView.Adapter<jadapter.vholder> {
         TextView tabfollow;
 
 
-        OnNoteListener onNoteLister;
-        vholder(View itemView, OnNoteListener onNoteLister) {
-            super(itemView);
-            memes = itemView.findViewById(R.id.imageView2);
-            fire=itemView.findViewById(R.id.tabfireimage);
-            litcount=itemView.findViewById(R.id.tablitnumber);
-            username=itemView.findViewById(R.id.tabusername);
-            profilePicture=itemView.findViewById(R.id.tabprofilepicture);
-            totalpoints=itemView.findViewById(R.id.tabtotalpoints);
-            tabfollow=itemView.findViewById(R.id.tabfollow);
-            this.onNoteLister=onNoteLister;
-            itemView.setOnClickListener(this);
-        }
 
-        @Override
-        public void onClick(View v) {
-            onNoteLister.onNoteClick(getAdapterPosition());
+        vholder(View view) {
+            super(view);
+            memes = view.findViewById(R.id.imageView2);
+            fire=view.findViewById(R.id.tabfireimage);
+            litcount=view.findViewById(R.id.tablitnumber);
+            username=view.findViewById(R.id.tabusername);
+            profilePicture=view.findViewById(R.id.tabprofilepicture);
+            totalpoints=view.findViewById(R.id.tabtotalpoints);
+            tabfollow=view.findViewById(R.id.tabfollow);
+
 
         }
+
+
     }
     public void clear(){
         Downloadimages.clear();
