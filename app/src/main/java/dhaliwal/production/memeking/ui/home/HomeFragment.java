@@ -10,7 +10,6 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
@@ -65,11 +64,12 @@ public class HomeFragment extends Fragment{
         //set up recylcerview;
         list=root.findViewById(R.id.homerecylerview);
         list.setHasFixedSize(true);
-        list.setItemViewCacheSize(20);
+        list.setItemViewCacheSize(10);
         list.setDrawingCacheEnabled(true);
         list.setNestedScrollingEnabled(false);
         list.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
-        list.setLayoutManager(new LinearLayoutManager(getContext()));
+        PreLoadingLinearLayoutManager preLoadingLinearLayoutManager=new PreLoadingLinearLayoutManager(getContext(),15);
+        list.setLayoutManager(preLoadingLinearLayoutManager);
         FirebaseDatabase database=FirebaseDatabase.getInstance();
         DatabaseReference memes=database.getReference("memes");
         memes.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -243,6 +243,7 @@ public class HomeFragment extends Fragment{
         int NUMBER_OF_ADS=downloadImage.size()/spaceBetweenAds;
         adLoader.loadAds(new AdRequest.Builder().build(), NUMBER_OF_ADS);
     }
+
 
 
 }
