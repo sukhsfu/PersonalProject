@@ -212,7 +212,7 @@ public class HomeFragment extends Fragment{
         list.setAdapter(Jadapter);
     }
     private void loadNativeAds() {
-
+        mNativeAds.clear();
         AdLoader.Builder builder = new AdLoader.Builder(context, getString(R.string.ad_unit_id));
         adLoader = builder.forUnifiedNativeAd(
                 new UnifiedNativeAd.OnUnifiedNativeAdLoadedListener() {
