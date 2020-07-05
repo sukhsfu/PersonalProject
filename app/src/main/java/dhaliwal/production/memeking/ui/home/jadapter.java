@@ -91,7 +91,7 @@ public class jadapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 final String postReferenceName = thisimage.getName();
                 final vholder holder = (vholder) holdermain;
 
-                updatedata(holder, postReferenceName);
+                updatedata(holder, postReferenceName,context);
 
                 Glide.with(context)
                         .load(thisimage)
@@ -102,7 +102,7 @@ public class jadapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 holder.fire.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        onStarClicked(holder, postReferenceName);
+                        onStarClicked(holder, postReferenceName,v.getContext());
 
                     }
 
@@ -111,7 +111,7 @@ public class jadapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 holder.tabfollow.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        onfollowClicked(holder, postReferenceName);
+                        onfollowClicked(holder, postReferenceName,v.getContext());
 
                     }
                 });
@@ -119,7 +119,7 @@ public class jadapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         }
     }
-    private void updatedata(final vholder holder, String postReferenceName){
+    private void updatedata(final vholder holder, String postReferenceName,final Context context1){
         final FirebaseUser user= FirebaseAuth.getInstance().getCurrentUser();
         final FirebaseDatabase database=FirebaseDatabase.getInstance();
         final DatabaseReference memePhotoReferences=database.getReference("memepicture").child(postReferenceName);
@@ -136,11 +136,11 @@ public class jadapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 int litnumber = post.getLit();
                 holder.litcount.setText(String.valueOf(litnumber));
                 if (post.stars.containsKey(user.getUid())) {
-                    Glide.with(context)
+                    Glide.with(context1)
                             .load(R.drawable.firecolor)
                             .into(holder.fire);
                 } else {
-                    Glide.with(context)
+                    Glide.with(context1)
                             .load(R.drawable.firebw)
                             .into(holder.fire);
 
@@ -180,7 +180,7 @@ public class jadapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                         int totalpoints = userProfileInfo.getPoints();
                         holder.username.setText(username);
                         holder.totalpoints.setText(String.valueOf(totalpoints));
-                        Glide.with(context)
+                        Glide.with(context1)
                                 .load(PhotoUri)
                                 .into(holder.profilePicture);
 
@@ -203,7 +203,7 @@ public class jadapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     }
 
-    private void onfollowClicked(final vholder holder, final String postReferenceName) {
+    private void onfollowClicked(final vholder holder, final String postReferenceName, final Context context1) {
         final FirebaseUser user= FirebaseAuth.getInstance().getCurrentUser();
         final FirebaseDatabase database=FirebaseDatabase.getInstance();
         final DatabaseReference memePhotoReferences=database.getReference("memepicture").child(postReferenceName);
@@ -266,7 +266,7 @@ public class jadapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
                        }
                    });
-                   updatedata(holder,postReferenceName);
+                   updatedata(holder,postReferenceName,context1);
                }
             }
 
@@ -278,7 +278,7 @@ public class jadapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     }
 
-    private void  onStarClicked(final vholder holder, final String postReferenceName){
+    private void  onStarClicked(final vholder holder, final String postReferenceName,final Context context1){
         final FirebaseUser user= FirebaseAuth.getInstance().getCurrentUser();
         final FirebaseDatabase database=FirebaseDatabase.getInstance();
         final DatabaseReference memePhotoReferences=database.getReference("memepicture").child(postReferenceName);
@@ -317,12 +317,12 @@ public class jadapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
                             @Override
                             public void onComplete(@Nullable DatabaseError databaseError, boolean b, @Nullable DataSnapshot dataSnapshot) {
-                                updatedata(holder,postReferenceName);
+                                updatedata(holder,postReferenceName,context1);
                             }
                         });
                     }
                     else{
-                        updatedata(holder,postReferenceName);
+                        updatedata(holder,postReferenceName,context1);
                     }
 
                 }
@@ -346,12 +346,12 @@ public class jadapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
                             @Override
                             public void onComplete(@Nullable DatabaseError databaseError, boolean b, @Nullable DataSnapshot dataSnapshot) {
-                                updatedata(holder,postReferenceName);
+                                updatedata(holder,postReferenceName,context1);
                             }
                         });
                     }
                     else{
-                        updatedata(holder,postReferenceName);
+                        updatedata(holder,postReferenceName,context1);
                     }
                 }
                 mutableData.setValue(post);
