@@ -2,10 +2,10 @@ package dhaliwal.production.memeking.ui.home;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -14,27 +14,34 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdLoader;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.formats.UnifiedNativeAd;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.ListResult;
 import com.google.firebase.storage.StorageReference;
 
-import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import dhaliwal.production.memeking.R;
 
-public class HomeFragment extends Fragment implements jadapter.OnNoteListener, AdapterView.OnItemSelectedListener{
+public class HomeFragment extends Fragment{
 
     private HomeViewModel homeViewModel;
     //Arraylist of StorageReference to pass to jadapter.
-    private ArrayList<StorageReference> downloadImage;
+    // The number of native ads to load and display.
+    public static final int spaceBetweenAds = 6;
+    private AdLoader adLoader;
+    private List<UnifiedNativeAd> mNativeAds = new ArrayList<>();
+
+    private ArrayList<Object> downloadImage;
     private jadapter Jadapter;
     private RecyclerView list;
     private Context context;
@@ -103,16 +110,16 @@ public class HomeFragment extends Fragment implements jadapter.OnNoteListener, A
                 memes.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        ArrayList<StorageReference> downloadImage2=new ArrayList<>();
+
                         for(DataSnapshot ds:dataSnapshot.getChildren()){
                             String memereferid=ds.getValue(String.class);
                             StorageReference memesReference2=storage.getReference().child("Memes").child(memereferid);
-                            downloadImage2.add(memesReference2);
+                            downloadImage.add(memesReference2);
                         }
-                        Collections.reverse(downloadImage2);
-
+                        Collections.reverse(downloadImage);
+                        loadNativeAds();
                         Jadapter.clear();
-                        Jadapter.addAll(downloadImage2);
+                        Jadapter.addAll(downloadImage);
                         swipeRefreshLayout.setRefreshing(false);
 
                     }
@@ -142,22 +149,54 @@ public class HomeFragment extends Fragment implements jadapter.OnNoteListener, A
 
 
     private void setRecyclerView(){
-        Jadapter =new jadapter(downloadImage, this,context);
+        loadNativeAds();
+        Jadapter =new jadapter(downloadImage,context);
         list.setAdapter(Jadapter);
     }
+    private void insertAdsInMenuItems() {
+        if (mNativeAds.size() <= 0) {
+            return;
+        }
 
-    @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        int offset = spaceBetweenAds+1;
+        int index = spaceBetweenAds;
+        for (UnifiedNativeAd ad: mNativeAds) {
+            downloadImage.add(index, ad);
+            index = index + offset;
+        }
+    }
+    private void loadNativeAds() {
 
+        AdLoader.Builder builder = new AdLoader.Builder(context, getString(R.string.ad_unit_id));
+        adLoader = builder.forUnifiedNativeAd(
+                new UnifiedNativeAd.OnUnifiedNativeAdLoadedListener() {
+                    @Override
+                    public void onUnifiedNativeAdLoaded(UnifiedNativeAd unifiedNativeAd) {
+                        // A native ad loaded successfully, check if the ad loader has finished loading
+                        // and if so, insert the ads into the list.
+                        mNativeAds.add(unifiedNativeAd);
+                        if (!adLoader.isLoading()) {
+                            insertAdsInMenuItems();
+                        }
+                    }
+                }).withAdListener(
+                new AdListener() {
+                    @Override
+                    public void onAdFailedToLoad(int errorCode) {
+                        // A native ad failed to load, check if the ad loader has finished loading
+                        // and if so, insert the ads into the list.
+                        Log.e("MainActivity", "The previous native ad failed to load. Attempting to"
+                                + " load another.");
+                        if (!adLoader.isLoading()) {
+                            insertAdsInMenuItems();
+                        }
+                    }
+                }).build();
+
+
+        int NUMBER_OF_ADS=downloadImage.size()/spaceBetweenAds;
+        adLoader.loadAds(new AdRequest.Builder().build(), NUMBER_OF_ADS);
     }
 
-    @Override
-    public void onNothingSelected(AdapterView<?> parent) {
 
-    }
-
-    @Override
-    public void onNoteClick(int position) {
-
-    }
 }
