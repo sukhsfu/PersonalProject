@@ -54,7 +54,7 @@ public class LoginActivity extends AppCompatActivity {
         startActivityForResult(AuthUI.getInstance()
                 .createSignInIntentBuilder()
                 .setAvailableProviders(providers)
-                .setLogo(R.drawable.fui_ic_facebook_white_22dp)//make memehub logo and update this.
+                .setLogo(R.mipmap.flow_back_round)//make memehub logo and update this.
                 .build(),RC_SIGN_IN);
 
 
@@ -108,13 +108,7 @@ public class LoginActivity extends AppCompatActivity {
                 Intent intent = display.makeIntent(LoginActivity.this);
                 startActivity(intent);
             }
-            else{
-                // Sign in failed. If response is null the user canceled the
-                // sign-in flow using the back button. Otherwise check
-                // response.getError().getErrorCode() and handle the error.
-                // ...
 
-            }
         }
     }
 
