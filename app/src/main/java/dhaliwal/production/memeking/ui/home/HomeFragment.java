@@ -33,7 +33,7 @@ public class HomeFragment extends Fragment implements NativeAdsManager.Listener{
     private HomeViewModel homeViewModel;
     //Arraylist of StorageReference to pass to jadapter.
     // The number of native ads to load and display.
-    public static final int spaceBetweenAds = 1;
+    public static final int spaceBetweenAds = 5;
     private List<NativeAd> mNativeAds = new ArrayList<>();
     private ArrayList<Object> downloadImage;
     private jadapter Jadapter;

@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
 
             }
-        }, 600);
+        }, 10);
     }
 
 
