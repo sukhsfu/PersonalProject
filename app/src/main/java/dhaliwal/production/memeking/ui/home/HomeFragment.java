@@ -13,10 +13,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.google.android.gms.ads.AdListener;
-import com.google.android.gms.ads.AdLoader;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.formats.UnifiedNativeAd;
+import com.facebook.ads.*;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -31,20 +28,21 @@ import java.util.List;
 
 import dhaliwal.production.memeking.R;
 
-public class HomeFragment extends Fragment{
+public class HomeFragment extends Fragment implements NativeAdsManager.Listener{
 
     private HomeViewModel homeViewModel;
     //Arraylist of StorageReference to pass to jadapter.
     // The number of native ads to load and display.
-    public static final int spaceBetweenAds = 6;
-    private AdLoader adLoader;
-    private List<UnifiedNativeAd> mNativeAds = new ArrayList<>();
-
+    public static final int spaceBetweenAds = 1;
+    private List<NativeAd> mNativeAds = new ArrayList<>();
     private ArrayList<Object> downloadImage;
     private jadapter Jadapter;
     private RecyclerView list;
     private Context context;
     private SwipeRefreshLayout swipeRefreshLayout;
+    private final String TAG = "facebook ad";
+    private NativeAdsManager mNativeAdsManager;
+
 
     public HomeFragment(){
 
@@ -117,8 +115,10 @@ public class HomeFragment extends Fragment{
                             downloadImage.add(memesReference2);
                         }
                         Collections.reverse(downloadImage);
-                        loadNativeAds2();
-
+                       // loadNativeAds();
+                        Jadapter.clear();
+                        Jadapter.addAll(downloadImage);
+                        //
                         swipeRefreshLayout.setRefreshing(false);
 
                     }
@@ -143,55 +143,8 @@ public class HomeFragment extends Fragment{
 
     }
 
-    private void loadNativeAds2() {
-              mNativeAds.clear();
-
-            AdLoader.Builder builder = new AdLoader.Builder(context, getString(R.string.ad_unit_id));
-            adLoader = builder.forUnifiedNativeAd(
-                    new UnifiedNativeAd.OnUnifiedNativeAdLoadedListener() {
-                        @Override
-                        public void onUnifiedNativeAdLoaded(UnifiedNativeAd unifiedNativeAd) {
-                            // A native ad loaded successfully, check if the ad loader has finished loading
-                            // and if so, insert the ads into the list.
-                            mNativeAds.add(unifiedNativeAd);
-                            if (!adLoader.isLoading()) {
-                                insertAdsInMenuItems2();
-                            }
-                        }
-                    }).withAdListener(
-                    new AdListener() {
-                        @Override
-                        public void onAdFailedToLoad(int errorCode) {
-                            // A native ad failed to load, check if the ad loader has finished loading
-                            // and if so, insert the ads into the list.
-                            Log.e("MainActivity", "The previous native ad failed to load. Attempting to"
-                                    + " load another.");
-                            if (!adLoader.isLoading()) {
-                                insertAdsInMenuItems2();
-                            }
-                        }
-                    }).build();
 
 
-            int NUMBER_OF_ADS=downloadImage.size()/spaceBetweenAds;
-            adLoader.loadAds(new AdRequest.Builder().build(), NUMBER_OF_ADS);
-        }
-
-    private void insertAdsInMenuItems2() {
-        if (mNativeAds.size() <= 0) {
-            return;
-        }
-
-        int offset = spaceBetweenAds+1;
-        int index = spaceBetweenAds;
-        for (UnifiedNativeAd ad: mNativeAds) {
-            downloadImage.add(index, ad);
-            index = index + offset;
-        }
-        Jadapter.clear();
-        Jadapter.addAll(downloadImage);
-
-    }
 
 
 
@@ -204,46 +157,59 @@ public class HomeFragment extends Fragment{
 
         int offset = spaceBetweenAds+1;
         int index = spaceBetweenAds;
-        for (UnifiedNativeAd ad: mNativeAds) {
+        for (NativeAd ad: mNativeAds) {
             downloadImage.add(index, ad);
             index = index + offset;
         }
-        Jadapter =new jadapter(downloadImage,context);
+        Jadapter =new jadapter(downloadImage,context, mNativeAdsManager);
         list.setAdapter(Jadapter);
     }
+    private void insertAdsInMenuItems2() {
+        if (mNativeAds.size() <= 0) {
+            return;
+        }
+
+        int offset = spaceBetweenAds+1;
+        int index = spaceBetweenAds;
+        for (NativeAd ad: mNativeAds) {
+            downloadImage.add(index, ad);
+            index = index + offset;
+        }
+        Jadapter.clear();
+        Jadapter.addAll(downloadImage);
+
+    }
     private void loadNativeAds() {
+        AdSettings.addTestDevice("9ffdea42-39d5-4ef0-bfc2-e22f70f632e8");
         mNativeAds.clear();
-        AdLoader.Builder builder = new AdLoader.Builder(context, getString(R.string.ad_unit_id));
-        adLoader = builder.forUnifiedNativeAd(
-                new UnifiedNativeAd.OnUnifiedNativeAdLoadedListener() {
-                    @Override
-                    public void onUnifiedNativeAdLoaded(UnifiedNativeAd unifiedNativeAd) {
-                        // A native ad loaded successfully, check if the ad loader has finished loading
-                        // and if so, insert the ads into the list.
-                        mNativeAds.add(unifiedNativeAd);
-                        if (!adLoader.isLoading()) {
-                            insertAdsInMenuItems();
-                        }
-                    }
-                }).withAdListener(
-                new AdListener() {
-                    @Override
-                    public void onAdFailedToLoad(int errorCode) {
-                        // A native ad failed to load, check if the ad loader has finished loading
-                        // and if so, insert the ads into the list.
-                        Log.e("MainActivity", "The previous native ad failed to load. Attempting to"
-                                + " load another.");
-                        if (!adLoader.isLoading()) {
-                            insertAdsInMenuItems();
-                        }
-                    }
-                }).build();
-
-
         int NUMBER_OF_ADS=downloadImage.size()/spaceBetweenAds;
-        adLoader.loadAds(new AdRequest.Builder().build(), NUMBER_OF_ADS);
+        mNativeAdsManager= new NativeAdsManager(context,"1952653651534818_2001259383340911",NUMBER_OF_ADS);
+        mNativeAdsManager.loadAds();
+        mNativeAdsManager.setListener(this);
+
+
+
     }
 
 
+    @Override
+    public void onAdsLoaded() {
+
+        Jadapter =new jadapter(downloadImage,context,mNativeAdsManager);
+        list.setAdapter(Jadapter);
+
+    }
+
+    @Override
+    public void onAdError(AdError adError) {
+
+    }
+    private void loadNativeAds2() {
+        mNativeAds.clear();
+        int NUMBER_OF_ADS=downloadImage.size()/spaceBetweenAds;
+        mNativeAdsManager= new NativeAdsManager(context,"1952653651534818_2001259383340911",NUMBER_OF_ADS);
+        mNativeAdsManager.loadAds();
+        mNativeAdsManager.setListener(this);
+    }
 
 }

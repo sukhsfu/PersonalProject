@@ -1,10 +1,12 @@
 package dhaliwal.production.memeking.ui.home;
-import com.google.android.gms.ads.formats.NativeAd;
-import com.google.android.gms.ads.formats.UnifiedNativeAd;
+import com.facebook.ads.AdIconView;
+import com.facebook.ads.AdOptionsView;
+import com.facebook.ads.MediaView;
+import com.facebook.ads.NativeAd;
 
 import android.util.Log;
 import android.widget.Button;
-import android.widget.RatingBar;
+import android.widget.LinearLayout;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -18,7 +20,9 @@ import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.google.android.gms.ads.formats.UnifiedNativeAdView;
+
+import com.facebook.ads.NativeAdLayout;
+import com.facebook.ads.NativeAdsManager;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -33,6 +37,7 @@ import com.google.firebase.storage.StorageReference;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import dhaliwal.production.memeking.Post;
@@ -43,7 +48,10 @@ public class jadapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
 
     private static final int MENU_ITEM_VIEW_TYPE = 0;
-    private static final int UNIFIED_NATIVE_AD_VIEW_TYPE = 1;
+    private static final int NATIVE_AD_VIEW_TYPE = 1;
+    private  NativeAdsManager mNativeAdsManager;
+    private List<NativeAd> mAdItems;
+    private static final int AD_DISPLAY_FREQUENCY = 1;
 
     //arraylist of StorageReferences to display images.
     private ArrayList<Object> Downloadimages=new ArrayList<>();
@@ -55,10 +63,12 @@ public class jadapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     /*
     *@param Downloadimages 1000 StorageReferences's to display in recylerView.
      */
-    jadapter(ArrayList<Object> Downloadimages, Context context){
+    jadapter(ArrayList<Object> Downloadimages, Context context, NativeAdsManager mNativeAdsManager){
 
         this.Downloadimages.addAll(Downloadimages);
         this.context=context;
+        this.mNativeAdsManager=mNativeAdsManager;
+        mAdItems=new ArrayList<>();
 
     }
 
@@ -66,9 +76,9 @@ public class jadapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         switch(viewType) {
-            case UNIFIED_NATIVE_AD_VIEW_TYPE:
-                View Adview = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.ad_unified, viewGroup, false);
-                return new UnifiedNativeAdViewHolder(Adview);
+            case NATIVE_AD_VIEW_TYPE:
+                NativeAdLayout Adview = (NativeAdLayout) LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.ad_unified, viewGroup, false);
+                return new AdHolder(Adview);
             case MENU_ITEM_VIEW_TYPE:
             default:
                 View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.mainactivitytab, viewGroup, false);
@@ -80,9 +90,44 @@ public class jadapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public void onBindViewHolder(@NotNull RecyclerView.ViewHolder holdermain, int position) {
         int viewType=getItemViewType(position);
         switch (viewType) {
-            case UNIFIED_NATIVE_AD_VIEW_TYPE:
-                UnifiedNativeAd nativeAd = (UnifiedNativeAd) Downloadimages.get(position);
-                populateNativeAdView(nativeAd, ((UnifiedNativeAdViewHolder) holdermain).getAdView());
+            case NATIVE_AD_VIEW_TYPE:
+                NativeAd ad;
+                if (mAdItems.size() > position / AD_DISPLAY_FREQUENCY) {
+                    ad = mAdItems.get(position / AD_DISPLAY_FREQUENCY);
+                } else {
+                    ad = mNativeAdsManager.nextNativeAd();
+                    if (!ad.isAdInvalidated()) {
+                        mAdItems.add(ad);
+                    } else {
+                        Log.w("HomeFragment", "Ad is invalidated!");
+                    }
+                }
+                AdHolder adHolder=(AdHolder)holdermain;
+                adHolder.adChoicesContainer.removeAllViews();
+                if (ad != null) {
+
+                    adHolder.tvAdTitle.setText(ad.getAdvertiserName());
+                    adHolder.tvAdBody.setText(ad.getAdBodyText());
+                    adHolder.tvAdSocialContext.setText(ad.getAdSocialContext());
+                    adHolder.tvAdSponsoredLabel.setText(R.string.sponsored);
+                    adHolder.btnAdCallToAction.setText(ad.getAdCallToAction());
+                    adHolder.btnAdCallToAction.setVisibility(
+                            ad.hasCallToAction() ? View.VISIBLE : View.INVISIBLE);
+                    AdOptionsView adOptionsView =
+                            new AdOptionsView(context, ad, adHolder.nativeAdLayout);
+                    adHolder.adChoicesContainer.addView(adOptionsView, 0);
+
+                    List<View> clickableViews = new ArrayList<>();
+                    clickableViews.add(adHolder.ivAdIcon);
+                    clickableViews.add(adHolder.mvAdMedia);
+                    clickableViews.add(adHolder.btnAdCallToAction);
+                    ad.registerViewForInteraction(
+                            adHolder.nativeAdLayout,
+                            adHolder.mvAdMedia,
+                            adHolder.ivAdIcon,
+                            clickableViews);
+                }
+
                 break;
             case MENU_ITEM_VIEW_TYPE:
             default:
@@ -409,60 +454,41 @@ public class jadapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     }
     @Override
     public int getItemViewType(int position) {
+        /*
         Object recyclerViewItem = Downloadimages.get(position);
-        if (recyclerViewItem instanceof UnifiedNativeAd) {
-            return UNIFIED_NATIVE_AD_VIEW_TYPE;
+        if (recyclerViewItem instanceof NativeAd) {
+            return NATIVE_AD_VIEW_TYPE;
         }
         return MENU_ITEM_VIEW_TYPE;
+
+         */
+
+        return position % AD_DISPLAY_FREQUENCY == 0 ? NATIVE_AD_VIEW_TYPE : MENU_ITEM_VIEW_TYPE;
     }
-    private void populateNativeAdView(UnifiedNativeAd nativeAd,
-                                      UnifiedNativeAdView adView) {
-        // Some assets are guaranteed to be in every UnifiedNativeAd.
-        ((TextView) adView.getHeadlineView()).setText(nativeAd.getHeadline());
-        ((TextView) adView.getBodyView()).setText(nativeAd.getBody());
-        ((Button) adView.getCallToActionView()).setText(nativeAd.getCallToAction());
+    private static class AdHolder extends RecyclerView.ViewHolder {
 
-        // These assets aren't guaranteed to be in every UnifiedNativeAd, so it's important to
-        // check before trying to display them.
-        NativeAd.Image icon = nativeAd.getIcon();
+        NativeAdLayout nativeAdLayout;
+        MediaView mvAdMedia;
+        MediaView ivAdIcon;
+        TextView tvAdTitle;
+        TextView tvAdBody;
+        TextView tvAdSocialContext;
+        TextView tvAdSponsoredLabel;
+        Button btnAdCallToAction;
+        LinearLayout adChoicesContainer;
 
-        if (icon == null) {
-            adView.getIconView().setVisibility(View.INVISIBLE);
-        } else {
-            ((ImageView) adView.getIconView()).setImageDrawable(icon.getDrawable());
-            adView.getIconView().setVisibility(View.VISIBLE);
+        AdHolder(NativeAdLayout adLayout) {
+            super(adLayout);
+
+            nativeAdLayout = adLayout;
+            mvAdMedia = adLayout.findViewById(R.id.native_ad_media);
+            tvAdTitle = adLayout.findViewById(R.id.native_ad_title);
+            tvAdBody = adLayout.findViewById(R.id.native_ad_body);
+            tvAdSocialContext = adLayout.findViewById(R.id.native_ad_social_context);
+            tvAdSponsoredLabel = adLayout.findViewById(R.id.native_ad_sponsored_label);
+            btnAdCallToAction = adLayout.findViewById(R.id.native_ad_call_to_action);
+            ivAdIcon = adLayout.findViewById(R.id.native_ad_icon);
+            adChoicesContainer = adLayout.findViewById(R.id.ad_choices_container);
         }
-
-        if (nativeAd.getPrice() == null) {
-            adView.getPriceView().setVisibility(View.INVISIBLE);
-        } else {
-            adView.getPriceView().setVisibility(View.VISIBLE);
-            ((TextView) adView.getPriceView()).setText(nativeAd.getPrice());
-        }
-
-        if (nativeAd.getStore() == null) {
-            adView.getStoreView().setVisibility(View.INVISIBLE);
-        } else {
-            adView.getStoreView().setVisibility(View.VISIBLE);
-            ((TextView) adView.getStoreView()).setText(nativeAd.getStore());
-        }
-
-        if (nativeAd.getStarRating() == null) {
-            adView.getStarRatingView().setVisibility(View.INVISIBLE);
-        } else {
-            ((RatingBar) adView.getStarRatingView())
-                    .setRating(nativeAd.getStarRating().floatValue());
-            adView.getStarRatingView().setVisibility(View.VISIBLE);
-        }
-
-        if (nativeAd.getAdvertiser() == null) {
-            adView.getAdvertiserView().setVisibility(View.INVISIBLE);
-        } else {
-            ((TextView) adView.getAdvertiserView()).setText(nativeAd.getAdvertiser());
-            adView.getAdvertiserView().setVisibility(View.VISIBLE);
-        }
-
-        // Assign native ad object to the native view.
-        adView.setNativeAd(nativeAd);
     }
 }

@@ -40,5 +40,8 @@
     <string name="report">Report</string>
 
     <string name="ad_unit_id">ca-app-pub-3940256099942544/8135179316</string>
+    <string name="sponsored">sponsored</string>
+    <string name="icon_desc">icon</string>
+    <string name="image_desc">image</string>
 
 </resources>
