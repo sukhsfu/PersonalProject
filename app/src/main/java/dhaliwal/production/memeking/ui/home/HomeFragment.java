@@ -119,8 +119,8 @@ public class HomeFragment extends Fragment implements NativeAdsManager.Listener{
                                 downloadImage.add(memesReference2);
                             }
                             Collections.reverse(downloadImage);
-                            Jadapter.clear();
                             loadNativeAds();
+
                             swipeRefreshLayout.setRefreshing(false);
 
                         }
@@ -172,7 +172,6 @@ public class HomeFragment extends Fragment implements NativeAdsManager.Listener{
 
     @Override
     public void onAdsLoaded() {
-
         Jadapter =new jadapter(downloadImage,context,mNativeAdsManager);
         list.setAdapter(Jadapter);
 
