@@ -24,6 +24,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -172,15 +173,24 @@ public class HomeFragment extends Fragment implements NativeAdsManager.Listener{
 
     @Override
     public void onAdsLoaded() {
-        ProgressBar progressBar=getActivity().findViewById(R.id.progressBar);
-        progressBar.setVisibility(View.GONE);
-        Jadapter =new jadapter(downloadImage,context,mNativeAdsManager);
-        list.setAdapter(Jadapter);
+
+            ProgressBar progressBar = getActivity().findViewById(R.id.progressBar);
+            progressBar.setVisibility(View.GONE);
+            Jadapter = new jadapter(downloadImage, context, mNativeAdsManager);
+            list.setAdapter(Jadapter);
+
+
 
     }
 
     @Override
     public void onAdError(AdError adError) {
+
+            ProgressBar progressBar = getActivity().findViewById(R.id.progressBar);
+            progressBar.setVisibility(View.GONE);
+            Jadapter = new jadapter(downloadImage, context, mNativeAdsManager);
+            list.setAdapter(Jadapter);
+
 
     }
 
