@@ -70,6 +70,7 @@ public class settingsFragment extends Fragment {
             user_Profile.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    try{
                     UserProfileInfo userProfileInfo = dataSnapshot.getValue(UserProfileInfo.class);
                     String photoUri = userProfileInfo.getProfile_photo();
                     name = userProfileInfo.getUsername();
@@ -81,6 +82,10 @@ public class settingsFragment extends Fragment {
                             .into(profileImageChanger);
 
                     username.setText(name);
+                }
+                        catch (NullPointerException e){
+                    System.out.print("NullPointerException Caught");
+                }
 
                 }
 
@@ -147,10 +152,15 @@ public class settingsFragment extends Fragment {
                                         storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                                             @Override
                                             public void onSuccess(Uri uri) {
+                                                try{
                                                 userProfileInfo.setProfile_photo(uri.toString());
                                                 user_Profile.setValue(userProfileInfo);
                                                 //add fragmentTransaction here.
                                                 Navigation.findNavController(touch).navigate(R.id.nav_home);
+                                            }
+                                                    catch (NullPointerException e){
+                                                System.out.print("NullPointerException Caught");
+                                            }
                                             }
                                         });
                                     }
@@ -168,6 +178,7 @@ public class settingsFragment extends Fragment {
                         user_Profile.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                try{
                                 UserProfileInfo userProfileInfo = dataSnapshot.getValue(UserProfileInfo.class);
                                 userProfileInfo.setUsername(changedname);
                                 user_Profile.setValue(userProfileInfo);
@@ -175,7 +186,10 @@ public class settingsFragment extends Fragment {
                                     Navigation.findNavController(touch).navigate(R.id.nav_home);
 
                                 }
-
+                            }
+                                catch (NullPointerException e){
+                                    System.out.print("NullPointerException Caught");
+                                }
                             }
 
                             @Override
