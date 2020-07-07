@@ -33,7 +33,6 @@ public class HomeFragment extends Fragment implements NativeAdsManager.Listener{
 
     //Arraylist of StorageReference to pass to jadapter.
     // The number of native ads to load and display.
-    private static final int spaceBetweenAds = 3;
     private ArrayList<Object> downloadImage;
     private jadapter Jadapter;
     private RecyclerView list;
@@ -165,8 +164,7 @@ public class HomeFragment extends Fragment implements NativeAdsManager.Listener{
 
     private void loadNativeAds() {
         AdSettings.addTestDevice("9ffdea42-39d5-4ef0-bfc2-e22f70f632e8");
-        int NUMBER_OF_ADS=downloadImage.size()/spaceBetweenAds;
-        mNativeAdsManager= new NativeAdsManager(context,"1952653651534818_2001259383340911",NUMBER_OF_ADS);
+        mNativeAdsManager= new NativeAdsManager(context,"1952653651534818_2001259383340911",10);
         mNativeAdsManager.loadAds();
         mNativeAdsManager.setListener(this);
 
