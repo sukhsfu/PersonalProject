@@ -51,7 +51,7 @@ public class jadapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private static final int NATIVE_AD_VIEW_TYPE = 1;
     private  NativeAdsManager mNativeAdsManager;
     private List<NativeAd> mAdItems;
-    private static final int AD_DISPLAY_FREQUENCY = 3;
+    private static final int AD_DISPLAY_FREQUENCY = 9;
 
     //arraylist of StorageReferences to display images.
     private ArrayList<Object> Downloadimages=new ArrayList<>();
