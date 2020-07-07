@@ -179,7 +179,7 @@ public class jadapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         memePhotoReferences.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
+                try{
                 Post post = dataSnapshot.getValue(Post.class);
 
 
@@ -225,6 +225,7 @@ public class jadapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 userReferencePost.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        try{
                         UserProfileInfo userProfileInfo = dataSnapshot.getValue(UserProfileInfo.class);
                         String username = userProfileInfo.getUsername();
                         String PhotoUri = userProfileInfo.getProfile_photo();
@@ -234,6 +235,10 @@ public class jadapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                         Glide.with(context1)
                                 .load(PhotoUri)
                                 .into(holder.profilePicture);
+                    }
+                            catch (NullPointerException e){
+                        System.out.print("NullPointerException Caught");
+                    }
 
 
                     }
@@ -243,6 +248,10 @@ public class jadapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
                     }
                 });
+            }
+            catch (NullPointerException e){
+                System.out.print("NullPointerException Caught");
+            }
             }
 
 
@@ -262,10 +271,11 @@ public class jadapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
         final DatabaseReference memePhotoReferences = database.getReference("memepicture").child(postReferenceName);
-        try{
+
         memePhotoReferences.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                try{
                 Post post = dataSnapshot.getValue(Post.class);
                 //uid of the user who uploaded post
                 final String uid = post.getUid();
@@ -275,6 +285,7 @@ public class jadapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     userReferenceApp.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            try{
                             UserProfileInfo userProfileInfo = dataSnapshot.getValue(UserProfileInfo.class);
                             if (userProfileInfo.followingId.containsKey(uid)) {
                                 userProfileInfo.followingId.remove(uid);
@@ -286,6 +297,10 @@ public class jadapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                                 userProfileInfo.setFollowing(number);
                             }
                             userReferenceApp.setValue(userProfileInfo);
+                        }
+                                catch (NullPointerException e){
+                            System.out.print("NullPointerException Caught");
+                        }
                         }
 
                         @Override
@@ -324,16 +339,17 @@ public class jadapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                     updatedata(holder, postReferenceName, context1);
                 }
             }
+                    catch (NullPointerException e){
+                System.out.print("NullPointerException Caught");
+            }
+            }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
         });
-    }
-        catch (NullPointerException e){
-            System.out.print("NullPointerException Caught");
-        }
+
     }
 
     private void  onStarClicked(final vholder holder, final String postReferenceName,final Context context1) {
@@ -354,63 +370,67 @@ public class jadapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 String postAuther = post.getUid();
                 final FirebaseDatabase database = FirebaseDatabase.getInstance();
                 final DatabaseReference postAutherPoints = database.getReference("user_profile").child(postAuther).child("points");
+                    try {
+                        if (post.stars.containsKey(user.getUid())) {
+                            //post unlit.
+                            int lit = post.getLit() - 1;
+                            post.setLit(lit);
+                            post.stars.remove(user.getUid());
+                            if (!(post.getUid().equals(user.getUid()))) {
+                                postAutherPoints.runTransaction(new Transaction.Handler() {
+                                    @NonNull
+                                    @Override
+                                    public Transaction.Result doTransaction(@NonNull MutableData mutableData) {
+                                        Integer points = mutableData.getValue(Integer.class);
+                                        if (points == null) {
+                                            return Transaction.success(mutableData);
+                                        }
+                                        int newpoints = points - 1;
+                                        mutableData.setValue(newpoints);
+                                        return Transaction.success(mutableData);
+                                    }
 
-                if (post.stars.containsKey(user.getUid())) {
-                    //post unlit.
-                    int lit = post.getLit() - 1;
-                    post.setLit(lit);
-                    post.stars.remove(user.getUid());
-                    if (!(post.getUid().equals(user.getUid()))) {
-                        postAutherPoints.runTransaction(new Transaction.Handler() {
-                            @NonNull
-                            @Override
-                            public Transaction.Result doTransaction(@NonNull MutableData mutableData) {
-                                Integer points = mutableData.getValue(Integer.class);
-                                if (points == null) {
-                                    return Transaction.success(mutableData);
-                                }
-                                int newpoints = points - 1;
-                                mutableData.setValue(newpoints);
-                                return Transaction.success(mutableData);
-                            }
-
-                            @Override
-                            public void onComplete(@Nullable DatabaseError databaseError, boolean b, @Nullable DataSnapshot dataSnapshot) {
+                                    @Override
+                                    public void onComplete(@Nullable DatabaseError databaseError, boolean b, @Nullable DataSnapshot dataSnapshot) {
+                                        updatedata(holder, postReferenceName, context1);
+                                    }
+                                });
+                            } else {
                                 updatedata(holder, postReferenceName, context1);
                             }
-                        });
-                    } else {
-                        updatedata(holder, postReferenceName, context1);
-                    }
 
-                } else {
-                    int lit = post.getLit() + 1;
-                    post.setLit(lit);
-                    post.stars.put(user.getUid(), true);
-                    if (!(post.getUid().equals(user.getUid()))) {
-                        postAutherPoints.runTransaction(new Transaction.Handler() {
-                            @NonNull
-                            @Override
-                            public Transaction.Result doTransaction(@NonNull MutableData mutableData) {
-                                Integer points = mutableData.getValue(Integer.class);
-                                if (points == null) {
-                                    return Transaction.success(mutableData);
-                                }
-                                int newpoints = points + 1;
-                                mutableData.setValue(newpoints);
-                                return Transaction.success(mutableData);
-                            }
+                        } else {
+                            int lit = post.getLit() + 1;
+                            post.setLit(lit);
+                            post.stars.put(user.getUid(), true);
+                            if (!(post.getUid().equals(user.getUid()))) {
+                                postAutherPoints.runTransaction(new Transaction.Handler() {
+                                    @NonNull
+                                    @Override
+                                    public Transaction.Result doTransaction(@NonNull MutableData mutableData) {
+                                        Integer points = mutableData.getValue(Integer.class);
+                                        if (points == null) {
+                                            return Transaction.success(mutableData);
+                                        }
+                                        int newpoints = points + 1;
+                                        mutableData.setValue(newpoints);
+                                        return Transaction.success(mutableData);
+                                    }
 
-                            @Override
-                            public void onComplete(@Nullable DatabaseError databaseError, boolean b, @Nullable DataSnapshot dataSnapshot) {
+                                    @Override
+                                    public void onComplete(@Nullable DatabaseError databaseError, boolean b, @Nullable DataSnapshot dataSnapshot) {
+                                        updatedata(holder, postReferenceName, context1);
+                                    }
+                                });
+                            } else {
                                 updatedata(holder, postReferenceName, context1);
                             }
-                        });
-                    } else {
-                        updatedata(holder, postReferenceName, context1);
+                        }
+                        mutableData.setValue(post);
                     }
-                }
-                mutableData.setValue(post);
+                    catch (NullPointerException e){
+                        System.out.print("NullPointerException Caught");
+                    }
                 return Transaction.success(mutableData);
             }
 
