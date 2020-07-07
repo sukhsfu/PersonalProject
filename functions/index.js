@@ -13,10 +13,10 @@ const functions = require('firebase-functions');
 
 
 
-   if(Number(after.count)<=20){
+   if(Number(after.count)<=230){
    return null;
     }
-     const newCount= after.count-7;
+     const newCount= after.count-115;
      const memes_ref=change.after.ref.parent.child("memes");
      var cnt=0;
      var photorefs= [];
@@ -25,7 +25,7 @@ const functions = require('firebase-functions');
         snapshot.forEach(function(childSnapshot){
 
         cnt++;
-        if(cnt<=7){
+        if(cnt<=115){
          photorefs.push(childSnapshot.val());
          memes_ref.child(childSnapshot.key).remove();
         }
