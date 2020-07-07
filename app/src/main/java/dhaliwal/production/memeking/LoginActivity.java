@@ -80,6 +80,7 @@ public class LoginActivity extends AppCompatActivity {
                 databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        try{
                         //make sure user does not exist.
                         String name = null;
                         Uri photoUri = null;
@@ -89,11 +90,15 @@ public class LoginActivity extends AppCompatActivity {
                                 photoUri = profile.getPhotoUrl();
                             }
                             //make UserProfile Info Object to insert in realtime database.
-                            UserProfileInfo userProfileInfo=new UserProfileInfo(photoUri.toString(),name);
+                            UserProfileInfo userProfileInfo = new UserProfileInfo(photoUri.toString(), name);
                             databaseReference.child(user.getUid()).setValue(userProfileInfo);
-                            Log.d(tag,"User has been successfully added to realtime database.");
+                            Log.d(tag, "User has been successfully added to realtime database.");
 
                         }
+                    }
+                            catch (NullPointerException e){
+                        System.out.print("NullPointerException Caught");
+                    }
 
                     }
 
