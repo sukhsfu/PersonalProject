@@ -164,20 +164,20 @@ public class jadapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         }
     }
-    private void updatedata(final vholder holder, String postReferenceName,final Context context1){
-        final FirebaseUser user= FirebaseAuth.getInstance().getCurrentUser();
-        final FirebaseDatabase database=FirebaseDatabase.getInstance();
-        final DatabaseReference memePhotoReferences=database.getReference("memepicture").child(postReferenceName);
+    private void updatedata(final vholder holder, String postReferenceName,final Context context1) {
+        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        final FirebaseDatabase database = FirebaseDatabase.getInstance();
+        final DatabaseReference memePhotoReferences = database.getReference("memepicture").child(postReferenceName);
+        try{
         memePhotoReferences.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                    Post post = dataSnapshot.getValue(Post.class);
+                Post post = dataSnapshot.getValue(Post.class);
 
 
-
-                    //uid of the user who uploaded post.
-                    final String uid = post.getUid();
+                //uid of the user who uploaded post.
+                final String uid = post.getUid();
                 int litnumber = post.getLit();
                 holder.litcount.setText(String.valueOf(litnumber));
                 if (post.stars.containsKey(user.getUid())) {
@@ -196,15 +196,14 @@ public class jadapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 userReferenceApp.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        Map<String,Boolean> map = (Map)dataSnapshot.getValue();
-                        if(map!=null) {
+                        Map<String, Boolean> map = (Map) dataSnapshot.getValue();
+                        if (map != null) {
                             if (map.containsKey(uid)) {
                                 holder.tabfollow.setText("following");
                             } else {
                                 holder.tabfollow.setText("+follow");
                             }
-                        }
-                        else{
+                        } else {
                             holder.tabfollow.setText("+follow");
                         }
                     }
@@ -245,74 +244,78 @@ public class jadapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
             }
         });
+    }
+        catch (NullPointerException e){
+            System.out.print("NullPointerException Caught");
+        }
 
     }
 
     private void onfollowClicked(final vholder holder, final String postReferenceName, final Context context1) {
-        final FirebaseUser user= FirebaseAuth.getInstance().getCurrentUser();
-        final FirebaseDatabase database=FirebaseDatabase.getInstance();
-        final DatabaseReference memePhotoReferences=database.getReference("memepicture").child(postReferenceName);
+        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        final FirebaseDatabase database = FirebaseDatabase.getInstance();
+        final DatabaseReference memePhotoReferences = database.getReference("memepicture").child(postReferenceName);
+        try{
         memePhotoReferences.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                Post post=dataSnapshot.getValue(Post.class);
+                Post post = dataSnapshot.getValue(Post.class);
                 //uid of the user who uploaded post
-               final String uid= post.getUid();
-               if(!user.getUid().equals(uid)) {
-                   final FirebaseDatabase database = FirebaseDatabase.getInstance();
-                   final DatabaseReference userReferenceApp = database.getReference("user_profile").child(user.getUid());
-                   userReferenceApp.addListenerForSingleValueEvent(new ValueEventListener() {
-                       @Override
-                       public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                           UserProfileInfo userProfileInfo = dataSnapshot.getValue(UserProfileInfo.class);
-                           if (userProfileInfo.followingId.containsKey(uid)) {
-                               userProfileInfo.followingId.remove(uid);
-                               int number = userProfileInfo.getFollowing() - 1;
-                               userProfileInfo.setFollowing(number);
-                           } else {
-                               userProfileInfo.followingId.put(uid, true);
-                               int number = userProfileInfo.getFollowing() + 1;
-                               userProfileInfo.setFollowing(number);
-                           }
-                           userReferenceApp.setValue(userProfileInfo);
-                       }
+                final String uid = post.getUid();
+                if (!user.getUid().equals(uid)) {
+                    final FirebaseDatabase database = FirebaseDatabase.getInstance();
+                    final DatabaseReference userReferenceApp = database.getReference("user_profile").child(user.getUid());
+                    userReferenceApp.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            UserProfileInfo userProfileInfo = dataSnapshot.getValue(UserProfileInfo.class);
+                            if (userProfileInfo.followingId.containsKey(uid)) {
+                                userProfileInfo.followingId.remove(uid);
+                                int number = userProfileInfo.getFollowing() - 1;
+                                userProfileInfo.setFollowing(number);
+                            } else {
+                                userProfileInfo.followingId.put(uid, true);
+                                int number = userProfileInfo.getFollowing() + 1;
+                                userProfileInfo.setFollowing(number);
+                            }
+                            userReferenceApp.setValue(userProfileInfo);
+                        }
 
-                       @Override
-                       public void onCancelled(@NonNull DatabaseError databaseError) {
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                       }
-                   });
-                   final DatabaseReference userReferencePost= database.getReference("user_profile").child(uid);
-                   userReferencePost.runTransaction(new Transaction.Handler() {
-                       @NonNull
-                       @Override
-                       public Transaction.Result doTransaction(@NonNull MutableData mutableData) {
-                           UserProfileInfo userProfileInfo=mutableData.getValue(UserProfileInfo.class);
-                           if(userProfileInfo==null){
-                               return Transaction.success(mutableData);
-                           }
-                           if(userProfileInfo.AudienceId.containsKey(user.getUid())){
-                               userProfileInfo.AudienceId.remove(user.getUid());
-                               int number=userProfileInfo.getAudience()-1;
-                               userProfileInfo.setAudience(number);
-                           }
-                           else{
-                               userProfileInfo.AudienceId.put(user.getUid(),true);
-                               int number=userProfileInfo.getAudience()+1;
-                               userProfileInfo.setAudience(number);
-                           }
-                           mutableData.setValue(userProfileInfo);
-                           return Transaction.success(mutableData);
+                        }
+                    });
+                    final DatabaseReference userReferencePost = database.getReference("user_profile").child(uid);
+                    userReferencePost.runTransaction(new Transaction.Handler() {
+                        @NonNull
+                        @Override
+                        public Transaction.Result doTransaction(@NonNull MutableData mutableData) {
+                            UserProfileInfo userProfileInfo = mutableData.getValue(UserProfileInfo.class);
+                            if (userProfileInfo == null) {
+                                return Transaction.success(mutableData);
+                            }
+                            if (userProfileInfo.AudienceId.containsKey(user.getUid())) {
+                                userProfileInfo.AudienceId.remove(user.getUid());
+                                int number = userProfileInfo.getAudience() - 1;
+                                userProfileInfo.setAudience(number);
+                            } else {
+                                userProfileInfo.AudienceId.put(user.getUid(), true);
+                                int number = userProfileInfo.getAudience() + 1;
+                                userProfileInfo.setAudience(number);
+                            }
+                            mutableData.setValue(userProfileInfo);
+                            return Transaction.success(mutableData);
 
-                       }
+                        }
 
-                       @Override
-                       public void onComplete(@Nullable DatabaseError databaseError, boolean b, @Nullable DataSnapshot dataSnapshot) {
+                        @Override
+                        public void onComplete(@Nullable DatabaseError databaseError, boolean b, @Nullable DataSnapshot dataSnapshot) {
 
-                       }
-                   });
-                   updatedata(holder,postReferenceName,context1);
-               }
+                        }
+                    });
+                    updatedata(holder, postReferenceName, context1);
+                }
             }
 
             @Override
@@ -320,33 +323,37 @@ public class jadapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
             }
         });
-
+    }
+        catch (NullPointerException e){
+            System.out.print("NullPointerException Caught");
+        }
     }
 
-    private void  onStarClicked(final vholder holder, final String postReferenceName,final Context context1){
-        final FirebaseUser user= FirebaseAuth.getInstance().getCurrentUser();
-        final FirebaseDatabase database=FirebaseDatabase.getInstance();
-        final DatabaseReference memePhotoReferences=database.getReference("memepicture").child(postReferenceName);
+    private void  onStarClicked(final vholder holder, final String postReferenceName,final Context context1) {
+        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        final FirebaseDatabase database = FirebaseDatabase.getInstance();
+        final DatabaseReference memePhotoReferences = database.getReference("memepicture").child(postReferenceName);
+        try{
         memePhotoReferences.runTransaction(new Transaction.Handler() {
             @NonNull
             @Override
             public Transaction.Result doTransaction(@NonNull MutableData mutableData) {
-                Post post=mutableData.getValue(Post.class);
+                Post post = mutableData.getValue(Post.class);
 
 
-                if(post==null){
+                if (post == null) {
                     return Transaction.success(mutableData);
                 }
-                String postAuther=post.getUid();
-                final FirebaseDatabase database=FirebaseDatabase.getInstance();
-                final DatabaseReference postAutherPoints=database.getReference("user_profile").child(postAuther).child("points");
+                String postAuther = post.getUid();
+                final FirebaseDatabase database = FirebaseDatabase.getInstance();
+                final DatabaseReference postAutherPoints = database.getReference("user_profile").child(postAuther).child("points");
 
-                if(post.stars.containsKey(user.getUid())){
+                if (post.stars.containsKey(user.getUid())) {
                     //post unlit.
-                    int lit=post.getLit()-1;
+                    int lit = post.getLit() - 1;
                     post.setLit(lit);
                     post.stars.remove(user.getUid());
-                    if(!(post.getUid().equals(user.getUid()))) {
+                    if (!(post.getUid().equals(user.getUid()))) {
                         postAutherPoints.runTransaction(new Transaction.Handler() {
                             @NonNull
                             @Override
@@ -362,20 +369,18 @@ public class jadapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
                             @Override
                             public void onComplete(@Nullable DatabaseError databaseError, boolean b, @Nullable DataSnapshot dataSnapshot) {
-                                updatedata(holder,postReferenceName,context1);
+                                updatedata(holder, postReferenceName, context1);
                             }
                         });
-                    }
-                    else{
-                        updatedata(holder,postReferenceName,context1);
+                    } else {
+                        updatedata(holder, postReferenceName, context1);
                     }
 
-                }
-                else{
-                    int lit=post.getLit()+1;
+                } else {
+                    int lit = post.getLit() + 1;
                     post.setLit(lit);
-                    post.stars.put(user.getUid(),true);
-                    if(!(post.getUid().equals(user.getUid()))) {
+                    post.stars.put(user.getUid(), true);
+                    if (!(post.getUid().equals(user.getUid()))) {
                         postAutherPoints.runTransaction(new Transaction.Handler() {
                             @NonNull
                             @Override
@@ -391,12 +396,11 @@ public class jadapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
                             @Override
                             public void onComplete(@Nullable DatabaseError databaseError, boolean b, @Nullable DataSnapshot dataSnapshot) {
-                                updatedata(holder,postReferenceName,context1);
+                                updatedata(holder, postReferenceName, context1);
                             }
                         });
-                    }
-                    else{
-                        updatedata(holder,postReferenceName,context1);
+                    } else {
+                        updatedata(holder, postReferenceName, context1);
                     }
                 }
                 mutableData.setValue(post);
@@ -408,6 +412,10 @@ public class jadapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
             }
         });
+    }
+        catch (NullPointerException e){
+            System.out.print("NullPointerException Caught");
+        }
 
 
     }

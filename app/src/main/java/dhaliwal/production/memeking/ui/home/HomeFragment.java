@@ -70,24 +70,29 @@ public class HomeFragment extends Fragment implements NativeAdsManager.Listener{
         list.setLayoutManager(preLoadingLinearLayoutManager);
         FirebaseDatabase database=FirebaseDatabase.getInstance();
         DatabaseReference memes=database.getReference("memes");
-        memes.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                downloadImage=new ArrayList<>();
-                for(DataSnapshot ds:dataSnapshot.getChildren()){
-                    String memereferid=ds.getValue(String.class);
-                    StorageReference memesReference2=storage.getReference().child("Memes").child(memereferid);
-                    downloadImage.add(memesReference2);
+        try {
+            memes.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    downloadImage = new ArrayList<>();
+                    for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                        String memereferid = ds.getValue(String.class);
+                        StorageReference memesReference2 = storage.getReference().child("Memes").child(memereferid);
+                        downloadImage.add(memesReference2);
+                    }
+                    Collections.reverse(downloadImage);
+                    loadNativeAds();
                 }
-                Collections.reverse(downloadImage);
-                loadNativeAds();
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
 
-            }
-        });
+                }
+            });
+        }
+        catch (NullPointerException e){
+            System.out.print("NullPointerException Caught");
+        }
 
 
 
@@ -105,30 +110,35 @@ public class HomeFragment extends Fragment implements NativeAdsManager.Listener{
                 final FirebaseStorage storage=FirebaseStorage.getInstance();
                 FirebaseDatabase database=FirebaseDatabase.getInstance();
                 DatabaseReference memes=database.getReference("memes");
-                memes.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                try {
+                    memes.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             downloadImage.clear();
-                        for(DataSnapshot ds:dataSnapshot.getChildren()){
-                            String memereferid=ds.getValue(String.class);
-                            StorageReference memesReference2=storage.getReference().child("Memes").child(memereferid);
-                            downloadImage.add(memesReference2);
+                            for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                                String memereferid = ds.getValue(String.class);
+                                StorageReference memesReference2 = storage.getReference().child("Memes").child(memereferid);
+                                downloadImage.add(memesReference2);
+                            }
+                            Collections.reverse(downloadImage);
+                            // loadNativeAds();
+                            Jadapter.clear();
+                            Jadapter.addAll(downloadImage);
+                            //
+                            swipeRefreshLayout.setRefreshing(false);
+
                         }
-                        Collections.reverse(downloadImage);
-                       // loadNativeAds();
-                        Jadapter.clear();
-                        Jadapter.addAll(downloadImage);
-                        //
-                        swipeRefreshLayout.setRefreshing(false);
-
-                    }
 
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                    }
-                });
+                        }
+                    });
+                }
+                catch (NullPointerException e){
+                    System.out.print("NullPointerException Caught");
+                }
 
 
             }
