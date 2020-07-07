@@ -2,7 +2,6 @@ package dhaliwal.production.memeking.ui.home;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,7 +12,9 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.facebook.ads.*;
+import com.facebook.ads.AdError;
+import com.facebook.ads.AdSettings;
+import com.facebook.ads.NativeAdsManager;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -24,7 +25,6 @@ import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
 import dhaliwal.production.memeking.R;
 
@@ -119,10 +119,8 @@ public class HomeFragment extends Fragment implements NativeAdsManager.Listener{
                                 downloadImage.add(memesReference2);
                             }
                             Collections.reverse(downloadImage);
-                            // loadNativeAds();
                             Jadapter.clear();
-                            Jadapter.addAll(downloadImage);
-                            //
+                            loadNativeAds();
                             swipeRefreshLayout.setRefreshing(false);
 
                         }
