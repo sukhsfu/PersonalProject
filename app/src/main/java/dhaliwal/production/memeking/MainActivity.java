@@ -26,7 +26,12 @@ public class MainActivity extends AppCompatActivity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
-        getSupportActionBar().hide();
+        try {
+            getSupportActionBar().hide();
+        }
+        catch (NullPointerException e){
+            System.out.print("NullPointerException Caught");
+        }
         //Authentication initializer.
         mAuth=FirebaseAuth.getInstance();
         /* Handler to start the next activity.

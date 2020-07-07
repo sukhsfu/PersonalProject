@@ -90,48 +90,52 @@ public class display extends AppCompatActivity {
     }
     //get user-name and profile photo from the realtime database  and set it on side bar
     private void retrieveuserinformation()  {
-        FirebaseUser user= FirebaseAuth.getInstance().getCurrentUser();
-        //getting the imageview and textview id's
-        NavigationView navigationView=findViewById(R.id.nav_view);
-        View mview=navigationView.getHeaderView(0);
-        final ImageView profileimage=mview.findViewById(R.id.profileImage);
-        final TextView username=mview.findViewById(R.id.textview_MeMeKing);
-        final FirebaseDatabase database=FirebaseDatabase.getInstance();
-        //get the datareference of profile_photo and username
-        final DatabaseReference profile_photoReference=database.getReference("user_profile").child(user.getUid()).child("profile_photo");
-        DatabaseReference usernameReference=database.getReference("user_profile").child(user.getUid()).child("username");
-        //addValueListener to profile_photoreference
-        profile_photoReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                String photoUri=dataSnapshot.getValue(String.class);
-                Glide.with(display.this)
-                        .load(photoUri)
-                        .placeholder(R.mipmap.placeholder)
-                        .centerCrop()
-                        .into(profileimage);
-            }
+        try {
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            //getting the imageview and textview id's
+            NavigationView navigationView = findViewById(R.id.nav_view);
+            View mview = navigationView.getHeaderView(0);
+            final ImageView profileimage = mview.findViewById(R.id.profileImage);
+            final TextView username = mview.findViewById(R.id.textview_MeMeKing);
+            final FirebaseDatabase database = FirebaseDatabase.getInstance();
+            //get the datareference of profile_photo and username
+            final DatabaseReference profile_photoReference = database.getReference("user_profile").child(user.getUid()).child("profile_photo");
+            DatabaseReference usernameReference = database.getReference("user_profile").child(user.getUid()).child("username");
+            //addValueListener to profile_photoreference
+            profile_photoReference.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    String photoUri = dataSnapshot.getValue(String.class);
+                    Glide.with(display.this)
+                            .load(photoUri)
+                            .placeholder(R.mipmap.placeholder)
+                            .centerCrop()
+                            .into(profileimage);
+                }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
 
-            }
-        });
-        usernameReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                String name=dataSnapshot.getValue(String.class);
-                username.setText(name);
-            }
+                }
+            });
+            usernameReference.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    String name = dataSnapshot.getValue(String.class);
+                    username.setText(name);
+                }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
 
-            }
-        });
+                }
+            });
 
 
-
+        }
+        catch (NullPointerException e){
+            System.out.print("NullPointerException Caught");
+        }
 
 
 
