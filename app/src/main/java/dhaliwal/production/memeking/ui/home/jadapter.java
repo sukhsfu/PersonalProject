@@ -51,7 +51,7 @@ public class jadapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private static final int NATIVE_AD_VIEW_TYPE = 1;
     private  NativeAdsManager mNativeAdsManager;
     private List<NativeAd> mAdItems;
-    private static final int AD_DISPLAY_FREQUENCY = 5;
+    private static final int AD_DISPLAY_FREQUENCY = 3;
 
     //arraylist of StorageReferences to display images.
     private ArrayList<Object> Downloadimages=new ArrayList<>();
@@ -132,7 +132,13 @@ public class jadapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             case MENU_ITEM_VIEW_TYPE:
             default:
                 //use Glide to set images in recyclerview.
-                int index = position - (position / AD_DISPLAY_FREQUENCY) - 1;
+                int index;
+                if(position==0){
+                    index=0;
+                }
+                else {
+                    index = position - (position / AD_DISPLAY_FREQUENCY) - 1;
+                }
                 StorageReference thisimage = (StorageReference) Downloadimages.get(index);
                 final String postReferenceName = thisimage.getName();
                 final vholder holder = (vholder) holdermain;
@@ -457,6 +463,9 @@ public class jadapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     @Override
     public int getItemViewType(int position) {
+        if(position==0){
+            return MENU_ITEM_VIEW_TYPE;
+        }
         return position % AD_DISPLAY_FREQUENCY == 0 ? NATIVE_AD_VIEW_TYPE : MENU_ITEM_VIEW_TYPE;
     }
     private static class AdHolder extends RecyclerView.ViewHolder {

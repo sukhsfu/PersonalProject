@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -32,13 +33,12 @@ public class HomeFragment extends Fragment implements NativeAdsManager.Listener{
 
     //Arraylist of StorageReference to pass to jadapter.
     // The number of native ads to load and display.
-    private static final int spaceBetweenAds = 5;
+    private static final int spaceBetweenAds = 3;
     private ArrayList<Object> downloadImage;
     private jadapter Jadapter;
     private RecyclerView list;
     private Context context;
     private SwipeRefreshLayout swipeRefreshLayout;
-    private final String TAG = "facebook ad";
     private NativeAdsManager mNativeAdsManager;
 
 
@@ -172,6 +172,8 @@ public class HomeFragment extends Fragment implements NativeAdsManager.Listener{
 
     @Override
     public void onAdsLoaded() {
+        ProgressBar progressBar=getActivity().findViewById(R.id.progressBar);
+        progressBar.setVisibility(View.GONE);
         Jadapter =new jadapter(downloadImage,context,mNativeAdsManager);
         list.setAdapter(Jadapter);
 
