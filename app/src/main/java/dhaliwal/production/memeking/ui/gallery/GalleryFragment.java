@@ -96,7 +96,7 @@ public class GalleryFragment extends Fragment  {
 
 
         if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            int request_code = 0;
+            int request_code = 1;
             requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},request_code);
         }
         else {
@@ -234,7 +234,21 @@ public class GalleryFragment extends Fragment  {
 
         }
     }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[]
+            grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(requestCode==1){
+            if (grantResults.length > 0 &&
+                    grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Intent galleryIntent=new Intent(Intent.ACTION_GET_CONTENT);
+                galleryIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE,true);
+                galleryIntent.setType("image/*");
+                startActivityForResult(galleryIntent,RESULT_LOAD_IMAGE);
 
+            }
+        }
+    }
 
 
 
