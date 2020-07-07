@@ -30,11 +30,9 @@ import dhaliwal.production.memeking.R;
 
 public class HomeFragment extends Fragment implements NativeAdsManager.Listener{
 
-    private HomeViewModel homeViewModel;
     //Arraylist of StorageReference to pass to jadapter.
     // The number of native ads to load and display.
-    public static final int spaceBetweenAds = 5;
-    private List<NativeAd> mNativeAds = new ArrayList<>();
+    private static final int spaceBetweenAds = 5;
     private ArrayList<Object> downloadImage;
     private jadapter Jadapter;
     private RecyclerView list;
@@ -52,7 +50,7 @@ public class HomeFragment extends Fragment implements NativeAdsManager.Listener{
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         //viewmodel should be used later to load the data.
-        homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
+        HomeViewModel homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
         //root view should be used instead of getActivity() to find or set items.
         View root = inflater.inflate(R.layout.fragment_home, container, false);
         context=getContext();
@@ -164,7 +162,6 @@ public class HomeFragment extends Fragment implements NativeAdsManager.Listener{
 
     private void loadNativeAds() {
         AdSettings.addTestDevice("9ffdea42-39d5-4ef0-bfc2-e22f70f632e8");
-        mNativeAds.clear();
         int NUMBER_OF_ADS=downloadImage.size()/spaceBetweenAds;
         mNativeAdsManager= new NativeAdsManager(context,"1952653651534818_2001259383340911",NUMBER_OF_ADS);
         mNativeAdsManager.loadAds();
