@@ -2,6 +2,8 @@ package dhaliwal.production.memeking.ui.settings;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -32,6 +34,8 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+
+import java.io.ByteArrayOutputStream;
 
 import dhaliwal.production.memeking.R;
 import dhaliwal.production.memeking.UserProfileInfo;
@@ -141,7 +145,13 @@ public class settingsFragment extends Fragment {
                         FirebaseStorage storage = FirebaseStorage.getInstance();
                         String path = "UserProfilePhoto/" + user.getUid() + "pic";
                         final StorageReference storageReference = storage.getReference(path);
-                        UploadTask uploadTask = storageReference.putFile(selectedImage);
+                        profileImageChanger.setDrawingCacheEnabled(true);
+                        profileImageChanger.buildDrawingCache();
+                        Bitmap bitmap = ((BitmapDrawable) profileImageChanger.getDrawable()).getBitmap();
+                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 50, baos);
+                        byte[] data = baos.toByteArray();
+                        UploadTask uploadTask = storageReference.putBytes(data);
                         uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                             @Override
                             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
