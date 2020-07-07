@@ -24,7 +24,6 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
-import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -69,10 +68,10 @@ public class HomeFragment extends Fragment implements NativeAdsManager.Listener{
         list.setLayoutManager(preLoadingLinearLayoutManager);
         FirebaseDatabase database=FirebaseDatabase.getInstance();
         DatabaseReference memes=database.getReference("memes");
-        try {
             memes.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    try{
                     downloadImage = new ArrayList<>();
                     for (DataSnapshot ds : dataSnapshot.getChildren()) {
                         String memereferid = ds.getValue(String.class);
@@ -82,16 +81,18 @@ public class HomeFragment extends Fragment implements NativeAdsManager.Listener{
                     Collections.reverse(downloadImage);
                     loadNativeAds();
                 }
+                    catch (NullPointerException e){
+                        System.out.print("NullPointerException Caught");
+                    }
+                }
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
 
                 }
             });
-        }
-        catch (NullPointerException e){
-            System.out.print("NullPointerException Caught");
-        }
+
+
 
 
 
@@ -109,21 +110,26 @@ public class HomeFragment extends Fragment implements NativeAdsManager.Listener{
                 final FirebaseStorage storage=FirebaseStorage.getInstance();
                 FirebaseDatabase database=FirebaseDatabase.getInstance();
                 DatabaseReference memes=database.getReference("memes");
-                try {
+
                     memes.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            downloadImage.clear();
-                            for (DataSnapshot ds : dataSnapshot.getChildren()) {
-                                String memereferid = ds.getValue(String.class);
-                                StorageReference memesReference2 = storage.getReference().child("Memes").child(memereferid);
-                                downloadImage.add(memesReference2);
+                            try {
+                                downloadImage.clear();
+                                for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                                    String memereferid = ds.getValue(String.class);
+                                    StorageReference memesReference2 = storage.getReference().child("Memes").child(memereferid);
+                                    downloadImage.add(memesReference2);
+                                }
+                                Collections.reverse(downloadImage);
+                                loadNativeAds();
+
+                                swipeRefreshLayout.setRefreshing(false);
+
                             }
-                            Collections.reverse(downloadImage);
-                            loadNativeAds();
-
-                            swipeRefreshLayout.setRefreshing(false);
-
+                            catch (NullPointerException e){
+                                System.out.print("NullPointerException Caught");
+                            }
                         }
 
 
@@ -132,10 +138,8 @@ public class HomeFragment extends Fragment implements NativeAdsManager.Listener{
 
                         }
                     });
-                }
-                catch (NullPointerException e){
-                    System.out.print("NullPointerException Caught");
-                }
+
+
 
 
             }
@@ -173,15 +177,20 @@ public class HomeFragment extends Fragment implements NativeAdsManager.Listener{
 
     @Override
     public void onAdsLoaded() {
-
+        try {
             ProgressBar progressBar = getActivity().findViewById(R.id.progressBar);
             progressBar.setVisibility(View.GONE);
             Jadapter = new jadapter(downloadImage, context, mNativeAdsManager);
             list.setAdapter(Jadapter);
-
-
-
+        }
+        catch (NullPointerException e){
+            System.out.print("NullPointerException Caught");
+        }
     }
+
+
+
+
 
     @Override
     public void onAdError(AdError adError) {
