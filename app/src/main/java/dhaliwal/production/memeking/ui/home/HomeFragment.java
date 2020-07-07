@@ -160,35 +160,8 @@ public class HomeFragment extends Fragment implements NativeAdsManager.Listener{
 
 
 
-    private void insertAdsInMenuItems() {
-        if (mNativeAds.size() <= 0) {
-            return;
-        }
 
-        int offset = spaceBetweenAds+1;
-        int index = spaceBetweenAds;
-        for (NativeAd ad: mNativeAds) {
-            downloadImage.add(index, ad);
-            index = index + offset;
-        }
-        Jadapter =new jadapter(downloadImage,context, mNativeAdsManager);
-        list.setAdapter(Jadapter);
-    }
-    private void insertAdsInMenuItems2() {
-        if (mNativeAds.size() <= 0) {
-            return;
-        }
 
-        int offset = spaceBetweenAds+1;
-        int index = spaceBetweenAds;
-        for (NativeAd ad: mNativeAds) {
-            downloadImage.add(index, ad);
-            index = index + offset;
-        }
-        Jadapter.clear();
-        Jadapter.addAll(downloadImage);
-
-    }
     private void loadNativeAds() {
         AdSettings.addTestDevice("9ffdea42-39d5-4ef0-bfc2-e22f70f632e8");
         mNativeAds.clear();
@@ -214,12 +187,6 @@ public class HomeFragment extends Fragment implements NativeAdsManager.Listener{
     public void onAdError(AdError adError) {
 
     }
-    private void loadNativeAds2() {
-        mNativeAds.clear();
-        int NUMBER_OF_ADS=downloadImage.size()/spaceBetweenAds;
-        mNativeAdsManager= new NativeAdsManager(context,"1952653651534818_2001259383340911",NUMBER_OF_ADS);
-        mNativeAdsManager.loadAds();
-        mNativeAdsManager.setListener(this);
-    }
+
 
 }
