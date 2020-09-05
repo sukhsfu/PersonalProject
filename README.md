@@ -16,10 +16,10 @@ App Overview:-<br />
  > -Firebase authentication is used to keep record of the user's signing in.<br /> 
 >  -when user open's the app, he reaches the main activity, where his authentication is checked and then moved to display activity or login activity accordingly.<br /> 
 >  -display activity has four fragments :-<br /> 
->>      GalleryFragment- for user to upload memes to firebase database.<br /> 
->>      HomeFragment- Fragment containing the recyclerview to display memes on the tab.<br /> 
->>      SettingsFragment- change username and profile picture.<br /> 
->>      Profile- user can view his profile.<br /> 
+>>      GalleryFragment- for user to upload memes to firebase database.
+>>      HomeFragment- Fragment containing the recyclerview to display memes on the tab.
+>>      SettingsFragment- change username and profile picture.
+>>      Profile- user can view his profile.
   Users can move back and forth accross these fragments through navigation controller.<br /> 
 >  -firebase realtime database is used to keep track of likes/unlikes on the meme, user followers and memes uploaded.<br /> 
 >  -Memes are stored in the firebase in queue data structure using the time (upto nanoseconds) they were uploaded. <br /> 
