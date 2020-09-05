@@ -32,4 +32,4 @@ New experiences gained:-
   -Integration of admob and facebook's API's.
   -Full stack experience and working with realtime data using firebase database and cloud functions.
   
-  link:-  https://play.google.com/store/apps/details?id=dhaliwal.production.memeking
+ link:-  https://play.google.com/store/apps/details?id=dhaliwal.production.memeking
