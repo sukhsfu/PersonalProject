@@ -8,9 +8,7 @@ import android.view.WindowManager;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.gms.ads.MobileAds;
-import com.google.android.gms.ads.initialization.InitializationStatus;
-import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
+import com.facebook.ads.AudienceNetworkAds;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -28,17 +26,20 @@ public class MainActivity extends AppCompatActivity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
-        getSupportActionBar().hide();
+        try {
+            getSupportActionBar().hide();
+        }
+        catch (NullPointerException e){
+            System.out.print("NullPointerException Caught");
+        }
         //Authentication initializer.
         mAuth=FirebaseAuth.getInstance();
         /* Handler to start the next activity.
         * Two cases-if the user is already signed in navigate to display activity.
         * otherwise take to the login activity. */
-        MobileAds.initialize(this, new OnInitializationCompleteListener() {
-            @Override
-            public void onInitializationComplete(InitializationStatus initializationStatus) {
-            }
-        });
+        AudienceNetworkAds.initialize(this);
+        //may need the explict initalisation.
+
 
 
         Handler myhandler = new Handler();
@@ -56,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
 
             }
-        }, 600);
+        }, 100);
     }
 
 

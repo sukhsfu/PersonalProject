@@ -17,7 +17,7 @@
         android:layout_width="96dp"
         android:layout_height="96dp"
         android:contentDescription="@string/nav_header_desc"
-        app:srcCompat="@mipmap/ic_meme_round"
+        app:srcCompat="@mipmap/flow_back_round"
         app:civ_border_width="2dp"
         app:civ_border_color="#FF000000"/>
 

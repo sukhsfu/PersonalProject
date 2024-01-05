@@ -54,8 +54,7 @@ dependencies {
     implementation 'com.twitter.sdk.android:twitter-core:3.1.1'
     //circularImageView dependencies
     implementation 'de.hdodenhof:circleimageview:3.1.0'
-    //ads dependencies
-    implementation 'com.google.android.gms:play-services-ads:19.2.0'
-    implementation 'com.google.firebase:firebase-ads:19.2.0'
+    //facebook ads dependencies
+    implementation 'com.facebook.android:audience-network-sdk:5.9.1'
 
 }

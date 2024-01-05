@@ -2,6 +2,8 @@ package dhaliwal.production.memeking.ui.settings;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -33,6 +35,8 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.io.ByteArrayOutputStream;
+
 import dhaliwal.production.memeking.R;
 import dhaliwal.production.memeking.UserProfileInfo;
 import dhaliwal.production.memeking.ui.gallery.GalleryFragment;
@@ -61,144 +65,164 @@ public class settingsFragment extends Fragment {
         profileImageChanger=root.findViewById(R.id.profileImageChanger);
         final EditText username=root.findViewById(R.id.settings_username);
         final Button savechanges=root.findViewById(R.id.settings_savechanges);
-        //gettiing the user from the firebase authentication
-        final FirebaseUser user= FirebaseAuth.getInstance().getCurrentUser();
-        //get the user from the firebase realtime database and set it in imageview and edittext
-        final FirebaseDatabase database=FirebaseDatabase.getInstance();
-        final DatabaseReference user_Profile=database.getReference("user_profile").child(user.getUid());
-        user_Profile.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                UserProfileInfo userProfileInfo=dataSnapshot.getValue(UserProfileInfo.class);
-                String photoUri=userProfileInfo.getProfile_photo();
-                 name=userProfileInfo.getUsername();
+        try {
+            //gettiing the user from the firebase authentication
+            final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            //get the user from the firebase realtime database and set it in imageview and edittext
+            final FirebaseDatabase database = FirebaseDatabase.getInstance();
+            final DatabaseReference user_Profile = database.getReference("user_profile").child(user.getUid());
+            user_Profile.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    try{
+                    UserProfileInfo userProfileInfo = dataSnapshot.getValue(UserProfileInfo.class);
+                    String photoUri = userProfileInfo.getProfile_photo();
+                    name = userProfileInfo.getUsername();
 
-                Glide.with(getContext())
-                        .load(photoUri)
-                        .placeholder(R.mipmap.placeholder)
-                        .centerCrop()
-                        .into(profileImageChanger);
+                    Glide.with(getContext())
+                            .load(photoUri)
+                            .placeholder(R.mipmap.placeholder)
+                            .centerCrop()
+                            .into(profileImageChanger);
 
-                username.setText(name);
+                    username.setText(name);
+                }
+                        catch (NullPointerException e){
+                    System.out.print("NullPointerException Caught");
+                }
 
-            }
+                }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
 
-            }
-        });
-        //set text watcher on edittext
-        username.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                changedname=String.valueOf(s);
-            }
+                }
+            });
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                changedname=String.valueOf(s);
+            //set text watcher on edittext
+            username.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                    changedname = String.valueOf(s);
+                }
 
-            }
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    changedname = String.valueOf(s);
 
-            @Override
-            public void afterTextChanged(Editable s) {
+                }
 
-            }
-        });
+                @Override
+                public void afterTextChanged(Editable s) {
 
-
-
-
+                }
+            });
 
 
             //click on the image to change profile_picture.
-        profileImageChanger.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //Pick photo from the gallery to change profile pick.
-                Intent intent=new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                startActivityForResult(intent,RESULT_LOAD_IMAGE);
-            }
-        });
-        //set click listener on the textview.
-        //...
-
-        //OnclickListener for the Done Button.
-        savechanges.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                savechanges.setEnabled(false);
-                 //1.send profile photo to firebase.//send if selectedImage!=null
-                //2.send username to firebase.//send if name !=changed name.
-                //3.take to memes activity.
-
-                //if the user set image
-                if(selectedImage!=null){
-                     FirebaseStorage storage= FirebaseStorage.getInstance();
-                     String path="UserProfilePhoto/"+user.getUid()+"pic";
-                   final StorageReference storageReference=storage.getReference(path);
-                   UploadTask uploadTask= storageReference.putFile(selectedImage);
-                    uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                        @Override
-                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                            user_Profile.addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                    final UserProfileInfo userProfileInfo=dataSnapshot.getValue(UserProfileInfo.class);
-                                    storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                                        @Override
-                                        public void onSuccess(Uri uri) {
-                                            userProfileInfo.setProfile_photo(uri.toString());
-                                            user_Profile.setValue(userProfileInfo);
-                                            //add fragmentTransaction here.
-                                            Navigation.findNavController(touch).navigate(R.id.nav_home);
-                                        }
-                                    });
-                                }
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError databaseError) {
-
-                                }
-                            });
-                        }
-                    });
+            profileImageChanger.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    //Pick photo from the gallery to change profile pick.
+                    Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                    startActivityForResult(intent, RESULT_LOAD_IMAGE);
                 }
-                //if the username is changed.
-                if(!(changedname.equals(name))){
-                    user_Profile.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                             UserProfileInfo userProfileInfo=dataSnapshot.getValue(UserProfileInfo.class);
-                             userProfileInfo.setUsername(changedname);
-                            user_Profile.setValue(userProfileInfo);
-                            if(selectedImage==null) {
-                               Navigation.findNavController(touch).navigate(R.id.nav_home);
+            });
+            //set click listener on the textview.
+            //...
 
+            //OnclickListener for the Done Button.
+            savechanges.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    savechanges.setEnabled(false);
+                    //1.send profile photo to firebase.//send if selectedImage!=null
+                    //2.send username to firebase.//send if name !=changed name.
+                    //3.take to memes activity.
+
+                    //if the user set image
+                    if (selectedImage != null) {
+                        FirebaseStorage storage = FirebaseStorage.getInstance();
+                        String path = "UserProfilePhoto/" + user.getUid() + "pic";
+                        final StorageReference storageReference = storage.getReference(path);
+                        profileImageChanger.setDrawingCacheEnabled(true);
+                        profileImageChanger.buildDrawingCache();
+                        Bitmap bitmap = ((BitmapDrawable) profileImageChanger.getDrawable()).getBitmap();
+                        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 50, baos);
+                        byte[] data = baos.toByteArray();
+                        UploadTask uploadTask = storageReference.putBytes(data);
+                        uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                            @Override
+                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                user_Profile.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                        final UserProfileInfo userProfileInfo = dataSnapshot.getValue(UserProfileInfo.class);
+                                        storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                            @Override
+                                            public void onSuccess(Uri uri) {
+                                                try{
+                                                userProfileInfo.setProfile_photo(uri.toString());
+                                                user_Profile.setValue(userProfileInfo);
+                                                //add fragmentTransaction here.
+                                                Navigation.findNavController(touch).navigate(R.id.nav_home);
+                                            }
+                                                    catch (NullPointerException e){
+                                                System.out.print("NullPointerException Caught");
+                                            }
+                                            }
+                                        });
+                                    }
+
+                                    @Override
+                                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                                    }
+                                });
+                            }
+                        });
+                    }
+                    //if the username is changed.
+                    if (!(changedname.equals(name))) {
+                        user_Profile.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                                try{
+                                UserProfileInfo userProfileInfo = dataSnapshot.getValue(UserProfileInfo.class);
+                                userProfileInfo.setUsername(changedname);
+                                user_Profile.setValue(userProfileInfo);
+                                if (selectedImage == null) {
+                                    Navigation.findNavController(touch).navigate(R.id.nav_home);
+
+                                }
+                            }
+                                catch (NullPointerException e){
+                                    System.out.print("NullPointerException Caught");
+                                }
                             }
 
-                        }
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
 
-                        }
-                    });
+                            }
+                        });
+
+
+                    }
+                    if (selectedImage == null && changedname.equals(name)) {
+                        Navigation.findNavController(touch).navigate(R.id.nav_home);
+                    }
 
 
                 }
-                if(selectedImage==null && changedname.equals(name)){
-                    Navigation.findNavController(touch).navigate(R.id.nav_home);
-                }
+            });
+            context = getContext();
+        }
+        catch (NullPointerException e){
+            System.out.print("NullPointerException Caught");
+        }
 
-
-
-
-
-
-
-            }
-        });
-        context=getContext();
         return root;
 
     }

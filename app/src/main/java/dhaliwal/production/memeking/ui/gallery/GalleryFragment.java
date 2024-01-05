@@ -57,7 +57,6 @@ import static android.app.Activity.RESULT_OK;
 public class GalleryFragment extends Fragment  {
     private static final int RESULT_LOAD_IMAGE=1;
 
-    private GalleryViewModel galleryViewModel;
     private GridView gridView;
     private ArrayList<Uri> imageuritoupload;
 
@@ -68,7 +67,7 @@ public class GalleryFragment extends Fragment  {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         setHasOptionsMenu(true);
-        galleryViewModel= new ViewModelProvider(this).get(GalleryViewModel.class);
+        GalleryViewModel galleryViewModel = new ViewModelProvider(this).get(GalleryViewModel.class);
 
         ContextThemeWrapper contextThemeWrapper=new ContextThemeWrapper(getContext(),R.style.themeupload);
         LayoutInflater layoutInflater=inflater.cloneInContext(contextThemeWrapper);
@@ -97,7 +96,7 @@ public class GalleryFragment extends Fragment  {
 
 
         if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            int request_code = 0;
+            int request_code = 1;
             requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},request_code);
         }
         else {
@@ -112,54 +111,59 @@ public class GalleryFragment extends Fragment  {
         buttonupload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(imageuritoupload.size()!=0){
+                if(imageuritoupload.size()!=0) {
                     //getting user and storage reference
-                    FirebaseUser user= FirebaseAuth.getInstance().getCurrentUser();
-                    final String uid=user.getUid();
-                    FirebaseDatabase database=FirebaseDatabase.getInstance();
-                    final int[] count = {0,0};
+                    try
+                    {
+                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                    final String uid = user.getUid();
+                    FirebaseDatabase database = FirebaseDatabase.getInstance();
+                    final int[] count = {0, 0};
                     buttonupload.setEnabled(false);
-                    for(Uri image:imageuritoupload){
-                        String path="Memes/"+UUID.randomUUID();
-                        final String path2=path.substring(6);
+                    for (Uri image : imageuritoupload) {
+                        String path = "Memes/" + UUID.randomUUID();
+                        final String path2 = path.substring(6);
                         String randomString;
                         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                            randomString= Instant.now()+path.substring(6,9);
-                            randomString=randomString.replace(".","");
-                        }
-                        else{
-                            TimeZone timeZone= TimeZone.getTimeZone("UTC");
-                            Calendar calendar=Calendar.getInstance(timeZone);
-                            SimpleDateFormat simpleDateFormat=new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",Locale.US);
+                            randomString = Instant.now() + path.substring(6, 9);
+                            randomString = randomString.replace(".", "");
+                        } else {
+                            TimeZone timeZone = TimeZone.getTimeZone("UTC");
+                            Calendar calendar = Calendar.getInstance(timeZone);
+                            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US);
                             simpleDateFormat.setTimeZone(timeZone);
-                            randomString=simpleDateFormat.format(calendar.getTime())+path.substring(6,9);
-                            randomString=randomString.replace(".","");
+                            randomString = simpleDateFormat.format(calendar.getTime()) + path.substring(6, 9);
+                            randomString = randomString.replace(".", "");
                         }
 
-                        StorageReference storageReference=storage.getReference(path);
-                        final DatabaseReference memePhotoReferences=database.getReference("memepicture").child(path2);
-                       final  DatabaseReference memes=database.getReference("memes").child(randomString);
-                        UploadTask uploadTask=storageReference.putFile(image);
+                        StorageReference storageReference = storage.getReference(path);
+                        final DatabaseReference memePhotoReferences = database.getReference("memepicture").child(path2);
+                        final DatabaseReference memes = database.getReference("memes").child(randomString);
+                        UploadTask uploadTask = storageReference.putFile(image);
                         uploadTask.addOnFailureListener(new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception e) {
-                                Toast.makeText(getContext(),"Failed",Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getContext(), "Failed", Toast.LENGTH_SHORT).show();
                                 count[1]++;
 
                             }
                         }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                             @Override
                             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                Post post=new Post(uid);
+                                Post post = new Post(uid);
                                 memePhotoReferences.setValue(post);
                                 memes.setValue(path2);
 
                                 count[0]++;
-                                if((count[0]+count[1])==imageuritoupload.size())
-                                incrementCount(count[0]);
+                                if ((count[0] + count[1]) == imageuritoupload.size())
+                                    incrementCount(count[0]);
                             }
                         });
 
+                    }
+                }
+                    catch (NullPointerException e){
+                        System.out.print("NullPointerException Caught");
                     }
 
                 }
@@ -211,9 +215,14 @@ public class GalleryFragment extends Fragment  {
                 }
 
              else {
-                Uri selectedImage = data.getData();
-                imageuritoupload.add(selectedImage);
-            imageURIs.add(selectedImage.toString());
+                 try {
+                     Uri selectedImage = data.getData();
+                     imageuritoupload.add(selectedImage);
+                     imageURIs.add(selectedImage.toString());
+                 }
+                 catch (NullPointerException e){
+                     System.out.print("NullPointerException Caught");
+                 }
             }
 
             int gridWidth = getResources().getDisplayMetrics().widthPixels;
@@ -225,7 +234,21 @@ public class GalleryFragment extends Fragment  {
 
         }
     }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[]
+            grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(requestCode==1){
+            if (grantResults.length > 0 &&
+                    grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Intent galleryIntent=new Intent(Intent.ACTION_GET_CONTENT);
+                galleryIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE,true);
+                galleryIntent.setType("image/*");
+                startActivityForResult(galleryIntent,RESULT_LOAD_IMAGE);
 
+            }
+        }
+    }
 
 
 
